@@ -313,25 +313,34 @@ function GameTable() {
             
             // Start with what we have (will show waiting message)
             const existingPlayers = (allPlayers && allPlayers.length > 0) 
-              ? allPlayers.filter(p => p && p.id).map(p => ({
-                  id: p.id,
-                  name: p.name,
-                  avatarURL: p.avatarURL || '/assets/boy.svg',
-                  chips: p.chips || 20000,
-                  roundStartChips: p.chips || 20000,
-                  roundEndChips: p.chips || 20000,
-                  currentRoundChipsInvested: 0,
-                  cards: [],
-                  showDownHand: { hand: [], descendingSortHand: [] },
-                  bet: 0,
-                  betReconciled: false,
-                  folded: false,
-                  allIn: false,
-                  canRaise: true,
-                  stackInvestment: 0,
-                  robot: false,
-                  isConnected: true
-                }))
+              ? allPlayers.filter(p => p && p.id).map(p => {
+                  // Ensure chips is a valid number
+                  const playerChips = (typeof p.chips === 'number' && !isNaN(p.chips))
+                    ? p.chips
+                    : (p.totalChips && typeof p.totalChips === 'number' && !isNaN(p.totalChips))
+                      ? p.totalChips
+                      : 20000;
+                  
+                  return {
+                    id: p.id,
+                    name: p.name,
+                    avatarURL: p.avatarURL || '/assets/boy.svg',
+                    chips: playerChips,
+                    roundStartChips: playerChips,
+                    roundEndChips: playerChips,
+                    currentRoundChipsInvested: 0,
+                    cards: [],
+                    showDownHand: { hand: [], descendingSortHand: [] },
+                    bet: 0,
+                    betReconciled: false,
+                    folded: false,
+                    allIn: false,
+                    canRaise: true,
+                    stackInvestment: 0,
+                    robot: false,
+                    isConnected: true
+                  };
+                })
               : null;
             
             initializeGame(initialChips, existingPlayers)
@@ -686,7 +695,9 @@ function GameTable() {
           const currentPlayer = players && players.length > 0 
             ? players.find(p => p.name === 'Player 1' || !p.robot) || players[0]
             : null;
-          const displayChips = currentPlayer ? currentPlayer.chips : (userProfile?.totalChips || 0);
+          const displayChips = currentPlayer 
+            ? (typeof currentPlayer.chips === 'number' && !isNaN(currentPlayer.chips) ? currentPlayer.chips : 0)
+            : (userProfile?.totalChips && typeof userProfile.totalChips === 'number' && !isNaN(userProfile.totalChips) ? userProfile.totalChips : 0);
           const displayName = currentPlayer ? currentPlayer.name : (userProfile?.username || 'Player');
           
           return (

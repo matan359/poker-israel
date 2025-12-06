@@ -722,12 +722,21 @@ const useGameStore = create((set, get) => ({
             updatedPlayers.forEach(roomPlayer => {
               const existingIndex = mergedPlayers.findIndex(p => p.id === roomPlayer.id);
               if (existingIndex !== -1) {
-                // Update existing player
+                // Update existing player - ensure chips is valid
+                const updatedChips = (typeof roomPlayer.chips === 'number' && !isNaN(roomPlayer.chips))
+                  ? roomPlayer.chips
+                  : (roomPlayer.totalChips && typeof roomPlayer.totalChips === 'number' && !isNaN(roomPlayer.totalChips))
+                    ? roomPlayer.totalChips
+                    : mergedPlayers[existingIndex].chips;
+                
+                // Ensure we don't set NaN
+                const safeChips = (typeof updatedChips === 'number' && !isNaN(updatedChips)) ? updatedChips : mergedPlayers[existingIndex].chips || 20000;
+                
                 mergedPlayers[existingIndex] = {
                   ...mergedPlayers[existingIndex],
                   name: roomPlayer.name,
                   avatarURL: roomPlayer.avatarURL || mergedPlayers[existingIndex].avatarURL,
-                  chips: roomPlayer.chips || mergedPlayers[existingIndex].chips,
+                  chips: safeChips,
                   isConnected: true
                 };
               } else if (!roomPlayer.robot) {
@@ -736,13 +745,20 @@ const useGameStore = create((set, get) => ({
                 // If game hasn't started yet (loading/waiting phase), add player as active
                 // If game is in progress, add them but they'll join next round
                 const isGameInProgress = phase && phase !== 'loading' && phase !== 'waiting' && phase !== 'initialDeal';
+                // Ensure chips is a valid number
+                const playerChips = (typeof roomPlayer.chips === 'number' && !isNaN(roomPlayer.chips)) 
+                  ? roomPlayer.chips 
+                  : (roomPlayer.totalChips && typeof roomPlayer.totalChips === 'number' && !isNaN(roomPlayer.totalChips))
+                    ? roomPlayer.totalChips
+                    : 20000;
+                
                 mergedPlayers.push({
                   id: roomPlayer.id,
                   name: roomPlayer.name,
                   avatarURL: roomPlayer.avatarURL || '/assets/boy.svg',
-                  chips: roomPlayer.chips || 20000,
-                  roundStartChips: roomPlayer.chips || 20000,
-                  roundEndChips: roomPlayer.chips || 20000,
+                  chips: playerChips,
+                  roundStartChips: playerChips,
+                  roundEndChips: playerChips,
                   currentRoundChipsInvested: 0,
                   cards: [],
                   showDownHand: { hand: [], descendingSortHand: [] },

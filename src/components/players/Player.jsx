@@ -116,11 +116,11 @@ const Player = (props) => {
           </h5>
           <div className="player-info--stash--container">
             <img className="player-info--stash--image" src={chipCountImageURL} alt="Player Stash"/>
-            <h5>{`${chips}`}</h5>
+            <h5>{typeof chips === 'number' && !isNaN(chips) ? chips.toLocaleString() : '0'}</h5>
           </div>
           <div className="player-info--bet--container">
             <img className="player-info--bet--image" src={playerBetImageURL} alt="Player Bet" />
-            <h5>{`Bet: ${bet}`}</h5>
+            <h5>{`Bet: ${typeof bet === 'number' && !isNaN(bet) ? bet : 0}`}</h5>
           </div>
           { renderDealerChip() }
         </div>
