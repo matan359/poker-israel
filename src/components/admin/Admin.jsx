@@ -283,7 +283,7 @@ const Admin = ({ isOpen, onClose }) => {
                         // Find user by email
                         const usersRef = collection(db, 'users');
                         const q = query(usersRef, where('email', '==', email));
-                        const snapshot = await getDocsQuery(q);
+                        const snapshot = await getDocs(q);
                         
                         if (snapshot.empty) {
                           // Try to find by uid if email not found
@@ -331,7 +331,7 @@ const Admin = ({ isOpen, onClose }) => {
                         const email = 'matanyou7@gmail.com';
                         const usersRef = collection(db, 'users');
                         const q = query(usersRef, where('email', '==', email));
-                        const snapshot = await getDocsQuery(q);
+                        const snapshot = await getDocs(q);
                         
                         if (snapshot.empty) {
                           // Try to find by searching all users
