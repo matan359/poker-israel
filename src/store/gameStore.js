@@ -324,6 +324,7 @@ const useGameStore = create((set, get) => ({
     );
 
     const newState = handleBet(cloneDeep(state), parseInt(bet, 10), parseInt(min, 10), parseInt(max, 10));
+    console.log('🎯 Bet action - new activePlayerIndex:', newState.activePlayerIndex, 'Phase:', newState.phase, 'Community cards:', newState.communityCards?.length || 0);
     set(newState);
 
     // Broadcast action to other players via Socket.io
@@ -337,12 +338,16 @@ const useGameStore = create((set, get) => ({
       });
     }
 
-    // Also sync via Firestore
+    // CRITICAL: Sync game state to Firestore immediately
     get().syncGameStateToFirestore(newState);
 
     // Auto-handle AI
     if (newState.players[newState.activePlayerIndex]?.robot && newState.phase !== 'showdown') {
       setTimeout(() => get().handleAI(), 1200);
+    } else if (newState.phase === 'flop' || newState.phase === 'turn' || newState.phase === 'river') {
+      // If we just moved to a new phase (flop/turn/river), the phase shift already happened
+      // But we need to make sure the betting round starts correctly
+      console.log('📊 New phase detected:', newState.phase, 'Community cards:', newState.communityCards?.length || 0);
     }
   },
 
