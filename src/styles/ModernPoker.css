@@ -137,13 +137,13 @@ body {
 }
 
 .modern-card-value {
-  font-size: 20px;
+  font-size: clamp(14px, 2.5vw, 20px);
   font-weight: bold;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .modern-card-suit {
-  font-size: 24px;
+  font-size: clamp(16px, 3vw, 24px);
   margin-top: 2px;
 }
 
@@ -639,14 +639,21 @@ body {
   }
   
   .modern-community-cards {
-    gap: 6px;
+    gap: clamp(4px, 1vw, 6px);
     top: 30% !important;
   }
   
   .modern-card {
-    width: 48px;
-    height: 68px;
-    font-size: 13px;
+    width: clamp(40px, 8vw, 48px);
+    height: clamp(56px, 12vh, 68px);
+  }
+  
+  .modern-card-value {
+    font-size: clamp(12px, 2vw, 16px);
+  }
+  
+  .modern-card-suit {
+    font-size: clamp(14px, 2.5vw, 20px);
   }
   
   .modern-action-bar {
