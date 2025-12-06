@@ -432,49 +432,77 @@ body {
   }
 }
 
+/* Logo in center */
 .game-logo-container {
   display: flex;
   align-items: center;
+  justify-content: center;
+  grid-column: 2;
+  position: relative;
 }
 
+/* User info on left */
 .game-user-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 17, 34, 0.5) 100%);
+  border-radius: 12px;
+  border: 1.5px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 
+    0 0 15px rgba(0, 255, 255, 0.4),
+    inset 0 0 10px rgba(0, 102, 255, 0.2);
+  backdrop-filter: blur(5px);
+  grid-column: 1;
+  justify-self: start;
 }
 
 .game-username {
   color: var(--neon-white);
-  text-shadow: 0 0 10px var(--cyan-glow);
-  font-weight: bold;
-  font-size: 16px;
+  text-shadow: 0 0 8px var(--cyan-glow);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.5px;
 }
 
 .game-chips {
-  color: #fff;
-  font-size: 14px;
+  color: #FFD700;
+  font-size: 13px;
+  font-weight: 500;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
 }
 
+/* Back button on right */
 .game-back-btn {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
-  border: 2px solid #00FFFF;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-  border-radius: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
+  border: 1.5px solid rgba(0, 255, 255, 0.6);
+  box-shadow: 
+    0 0 15px rgba(0, 255, 255, 0.5),
+    inset 0 0 10px rgba(0, 102, 255, 0.3);
+  border-radius: 10px;
   color: var(--neon-white);
-  text-shadow: 0 0 10px var(--cyan-glow);
-  font-size: 14px;
-  font-weight: bold;
+  text-shadow: 0 0 8px var(--cyan-glow);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  grid-column: 3;
+  justify-self: end;
+  backdrop-filter: blur(5px);
 }
 
 .game-back-btn:hover {
-  background: linear-gradient(135deg, var(--bright-blue) 0%, var(--primary-blue) 100%);
-  box-shadow: 0 0 20px var(--cyan-glow);
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.95) 0%, rgba(0, 102, 255, 0.95) 100%);
+  box-shadow: 
+    0 0 25px rgba(0, 255, 255, 0.8),
+    inset 0 0 15px rgba(0, 191, 255, 0.4);
   transform: translateY(-2px);
+  border-color: rgba(0, 255, 255, 0.9);
 }
 
 /* Modern Table */
