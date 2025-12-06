@@ -48,8 +48,16 @@ export const calculateHandStrength = (playerCards, communityCards) => {
   const { isFlush, flushedSuit } = checkFlush(suitHistogram);
   const flushCards = isFlush ? descendingSortHand.filter(card => card.suit === flushedSuit) : [];
   const isRoyalFlush = isFlush && checkRoyalFlush(flushCards);
-  const { isStraightFlush } = isFlush ? checkStraightFlush(flushCards) : { isStraightFlush: false };
-  const { isStraight } = checkStraight(valueSet);
+  
+  // checkStraightFlush returns an object with isStraightFlush property
+  let isStraightFlush = false;
+  if (isFlush) {
+    const straightFlushResult = checkStraightFlush(flushCards);
+    isStraightFlush = straightFlushResult?.isStraightFlush || false;
+  }
+  
+  const straightResult = checkStraight(valueSet);
+  const isStraight = straightResult?.isStraight || false;
   const { isFourOfAKind, isFullHouse, isThreeOfAKind, isTwoPair, isPair } = analyzeHistogram(descendingSortHand, frequencyHistogram);
   
   // Determine hand strength
