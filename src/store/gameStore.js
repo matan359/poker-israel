@@ -289,12 +289,36 @@ const useGameStore = create((set, get) => ({
 
   handleBetInputSubmit: (bet, min, max) => {
     const state = get();
-    const { playerAnimationSwitchboard, activePlayerIndex, socket, roomId } = state;
+    const { playerAnimationSwitchboard, activePlayerIndex, socket, roomId, userProfile } = state;
+    
+    // CRITICAL: Only allow action if this is the current user's turn
+    if (!userProfile) {
+      // Try to get userProfile from authStore
+      const authStoreModule = require('./authStore');
+      const authState = authStoreModule.default.getState();
+      if (!authState.userProfile) {
+        console.error('Cannot perform action: user not authenticated');
+        return;
+      }
+      state.userProfile = authState.userProfile;
+    }
+    
+    const activePlayer = state.players[activePlayerIndex];
+    if (!activePlayer) {
+      console.error('No active player');
+      return;
+    }
+    
+    // Check if the active player is the current user
+    if (activePlayer.id !== state.userProfile.uid && !activePlayer.robot) {
+      console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', state.userProfile.uid);
+      return; // Don't allow action if it's not the current user's turn
+    }
     
     // Show animation
     get().pushAnimationState(
       activePlayerIndex,
-      `${state.players[activePlayerIndex].name} bets ${bet}`
+      `${activePlayer.name} bets ${bet}`
     );
 
     const newState = handleBet(cloneDeep(state), parseInt(bet, 10), parseInt(min, 10), parseInt(max, 10));
@@ -304,7 +328,7 @@ const useGameStore = create((set, get) => ({
     if (socket && roomId && socket.connected) {
       socket.emit('playerAction', {
         roomId,
-        playerId: state.players[activePlayerIndex].id,
+        playerId: activePlayer.id,
         action: 'bet',
         amount: bet,
         gameState: newState
@@ -322,7 +346,32 @@ const useGameStore = create((set, get) => ({
 
   handleFold: () => {
     const state = get();
-    const { socket, roomId } = state;
+    const { socket, roomId, userProfile } = state;
+    
+    // CRITICAL: Only allow action if this is the current user's turn
+    if (!userProfile) {
+      // Try to get userProfile from authStore
+      const authStoreModule = require('./authStore');
+      const authState = authStoreModule.default.getState();
+      if (!authState.userProfile) {
+        console.error('Cannot perform action: user not authenticated');
+        return;
+      }
+      state.userProfile = authState.userProfile;
+    }
+    
+    const activePlayer = state.players[state.activePlayerIndex];
+    if (!activePlayer) {
+      console.error('No active player');
+      return;
+    }
+    
+    // Check if the active player is the current user
+    if (activePlayer.id !== state.userProfile.uid && !activePlayer.robot) {
+      console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', state.userProfile.uid);
+      return; // Don't allow action if it's not the current user's turn
+    }
+    
     const newState = handleFold(cloneDeep(state));
     set(newState);
 
@@ -330,7 +379,7 @@ const useGameStore = create((set, get) => ({
     if (socket && roomId && socket.connected) {
       socket.emit('playerAction', {
         roomId,
-        playerId: state.players[state.activePlayerIndex].id,
+        playerId: activePlayer.id,
         action: 'fold',
         gameState: newState
       });
@@ -644,8 +693,8 @@ const useGameStore = create((set, get) => ({
           });
           
           // Update timestamp for current user
-          const authStore = await import('./authStore');
-          const { userProfile } = authStore.default.getState();
+          const authStoreModule = require('./authStore');
+          const { userProfile } = authStoreModule.default.getState();
           const updatedPlayers = activePlayers.map(p => {
             if (p.id === userProfile?.uid) {
               return { ...p, lastSeen: new Date().toISOString() };

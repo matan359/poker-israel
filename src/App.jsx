@@ -542,9 +542,19 @@ function GameTable() {
   };
 
   const renderActionButtons = () => {
-    if (!players || activePlayerIndex === null) return null;
+    if (!players || activePlayerIndex === null || !userProfile) return null;
     const activePlayer = players[activePlayerIndex];
     if (activePlayer?.robot || phase === 'showdown') return null;
+
+    // CRITICAL: Only show action buttons if it's the current user's turn
+    const isCurrentUserTurn = activePlayer.id === userProfile.uid;
+    if (!isCurrentUserTurn) {
+      return (
+        <div className="waiting-for-player">
+          <p>ממתין ל-{activePlayer.name}...</p>
+        </div>
+      );
+    }
 
     const min = determineMinBet(highBet, activePlayer.chips, activePlayer.bet);
     const max = activePlayer.chips + activePlayer.bet;
