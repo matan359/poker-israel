@@ -250,7 +250,7 @@ const useGameStore = create((set, get) => ({
       // Note: Cards are NOT synced to Firestore for security
       get().syncGameStateToFirestore(newState);
       
-      // Auto-handle AI players after a short delay
+      // Auto-handle AI players immediately (small delay only for UI animation)
       setTimeout(() => {
         const currentState = get();
         if (currentState.players && 
@@ -259,7 +259,7 @@ const useGameStore = create((set, get) => ({
             currentState.phase !== 'showdown') {
           get().handleAI();
         }
-      }, 1500);
+      }, 500); // Reduced from 1500ms to 500ms for faster gameplay
     } else {
       console.error('Failed to deal cards');
     }
