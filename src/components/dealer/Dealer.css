@@ -4,7 +4,7 @@
  */
 .dealer-container {
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
