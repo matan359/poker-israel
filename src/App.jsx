@@ -167,41 +167,36 @@ function GameTable() {
     }
   }, [isAuthenticated, userProfile, socket, setSocket, joinRoom]);
 
-  // Also join room via Firestore if we're on a game page (backup method)
+  // CRITICAL: Join room immediately when entering game page (primary method)
   useEffect(() => {
     if (isAuthenticated && userProfile && window.location.pathname === '/game') {
       const urlParams = new URLSearchParams(window.location.search);
       const tableParam = urlParams.get('table');
       if (tableParam) {
-        // Wait a bit to see if Socket.io will connect, then join via Firestore
-        const timeout = setTimeout(() => {
-          const { roomId } = useGameStore.getState();
-          // Only join if we haven't joined yet
-          if (!roomId || roomId !== tableParam) {
-            const playerData = {
-              id: userProfile.uid,
-              name: userProfile.username,
-              avatarURL: userProfile.avatarURL || '/assets/boy.svg',
-              chips: userProfile.totalChips || 20000
-            };
-            console.log('Joining room via Firestore (backup):', tableParam, 'as player:', playerData.name);
-            joinRoom(tableParam, playerData);
-          }
-        }, 2000); // Wait 2 seconds for Socket.io to connect
-        
-        return () => clearTimeout(timeout);
+        const { roomId } = useGameStore.getState();
+        // Join immediately if not already joined
+        if (!roomId || roomId !== tableParam) {
+          const playerData = {
+            id: userProfile.uid,
+            name: userProfile.username,
+            avatarURL: userProfile.avatarURL || '/assets/boy.svg',
+            chips: userProfile.totalChips || 20000
+          };
+          console.log('🚀 IMMEDIATELY joining room via Firestore:', tableParam, 'as player:', playerData.name);
+          joinRoom(tableParam, playerData);
+        }
       }
     }
   }, [isAuthenticated, userProfile, joinRoom]);
 
-  // Initialize game when component mounts
+  // Initialize game when component mounts - WAIT for players to join
   useEffect(() => {
     if (!gameInitialized && !players && isAuthenticated && userProfile) {
-      console.log('Initializing game...');
+      console.log('⏳ Waiting for players before initializing game...');
       const initialChips = userProfile?.totalChips || 20000;
       const { connectedPlayers, roomId } = useGameStore.getState();
       
-      // Wait a bit for players to connect
+      // Wait for players to connect via Firestore
       const checkPlayers = async () => {
         // Check password if table is private
         const urlParams = new URLSearchParams(window.location.search);
@@ -239,24 +234,29 @@ function GameTable() {
           }
         }
         
-        // Wait for at least 2 players
+        // Wait for at least 2 players - CRITICAL for multiplayer
         let attempts = 0;
-        const maxAttempts = 10; // Wait up to 10 seconds
+        const maxAttempts = 30; // Wait up to 30 seconds for players to join
         
         const waitForPlayers = setInterval(async () => {
           attempts++;
-          const { connectedPlayers: currentPlayers } = useGameStore.getState();
+          const { connectedPlayers: currentPlayers, roomId: currentRoomId } = useGameStore.getState();
           
-          // Get players from Firestore room
+          // Get players from Firestore room (most reliable)
           let roomPlayers = [];
-          if (roomId) {
+          const tableId = urlParams.get('table') || currentRoomId;
+          
+          if (tableId) {
             try {
               const { doc, getDoc } = await import('firebase/firestore');
               const { db } = await import('./config/firebase');
-              const roomRef = doc(db, 'game_rooms', roomId);
+              const roomRef = doc(db, 'game_rooms', tableId);
               const roomSnap = await getDoc(roomRef);
               if (roomSnap.exists()) {
                 roomPlayers = roomSnap.data().players || [];
+                console.log(`👥 Found ${roomPlayers.length} players in room ${tableId}:`, roomPlayers.map(p => p.name));
+              } else {
+                console.log(`⏳ Room ${tableId} doesn't exist yet, waiting...`);
               }
             } catch (error) {
               console.error('Error loading room players:', error);
@@ -264,11 +264,48 @@ function GameTable() {
           }
           
           const allPlayers = roomPlayers.length > 0 ? roomPlayers : (currentPlayers || []);
+          console.log(`🔄 Attempt ${attempts}/${maxAttempts}: Found ${allPlayers.length} players`);
           
-          if (allPlayers.length >= 2 || attempts >= maxAttempts) {
+          // CRITICAL: Only start if we have at least 2 players OR we've waited too long
+          if (allPlayers.length >= 2) {
             clearInterval(waitForPlayers);
+            console.log(`✅ Starting game with ${allPlayers.length} players!`);
             
             // Convert players to game format
+            const existingPlayers = allPlayers.map(p => ({
+              id: p.id,
+              name: p.name,
+              avatarURL: p.avatarURL || '/assets/boy.svg',
+              chips: p.chips || 20000,
+              roundStartChips: p.chips || 20000,
+              roundEndChips: p.chips || 20000,
+              currentRoundChipsInvested: 0,
+              cards: [],
+              showDownHand: { hand: [], descendingSortHand: [] },
+              bet: 0,
+              betReconciled: false,
+              folded: false,
+              allIn: false,
+              canRaise: true,
+              stackInvestment: 0,
+              robot: false,
+              isConnected: true
+            }));
+            
+            initializeGame(initialChips, existingPlayers)
+              .then(() => {
+                console.log('✅ Game initialized successfully with', existingPlayers.length, 'players');
+                setGameInitialized(true);
+              })
+              .catch((error) => {
+                console.error('❌ Error initializing game:', error);
+                setGameInitialized(true);
+              });
+          } else if (attempts >= maxAttempts) {
+            clearInterval(waitForPlayers);
+            console.warn(`⚠️ Timeout: Starting game with only ${allPlayers.length} player(s)`);
+            
+            // Start with what we have (will show waiting message)
             const existingPlayers = allPlayers.length > 0 
               ? allPlayers.map(p => ({
                   id: p.id,
@@ -293,7 +330,7 @@ function GameTable() {
             
             initializeGame(initialChips, existingPlayers)
               .then(() => {
-                console.log('Game initialized successfully');
+                console.log('Game initialized (timeout)');
                 setGameInitialized(true);
               })
               .catch((error) => {

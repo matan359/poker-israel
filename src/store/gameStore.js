@@ -634,6 +634,9 @@ const useGameStore = create((set, get) => ({
               } else if (!roomPlayer.robot) {
                 // Add new real player (not robot)
                 hasNewPlayers = true;
+                // If game hasn't started yet (loading/waiting phase), add player as active
+                // If game is in progress, add them but they'll join next round
+                const isGameInProgress = phase && phase !== 'loading' && phase !== 'waiting' && phase !== 'initialDeal';
                 updatedPlayers.push({
                   id: roomPlayer.id,
                   name: roomPlayer.name,
@@ -646,14 +649,14 @@ const useGameStore = create((set, get) => ({
                   showDownHand: { hand: [], descendingSortHand: [] },
                   bet: 0,
                   betReconciled: false,
-                  folded: phase === 'showdown' ? false : true, // Fold new players if game is in progress
+                  folded: isGameInProgress, // Only fold if game is already in progress
                   allIn: false,
                   canRaise: true,
                   stackInvestment: 0,
                   robot: false,
                   isConnected: true,
                 });
-                console.log('✅ Added new player to game:', roomPlayer.name);
+                console.log(`✅ Added new player to game: ${roomPlayer.name} (${isGameInProgress ? 'will join next round' : 'active now'})`);
               }
             });
             
@@ -666,10 +669,39 @@ const useGameStore = create((set, get) => ({
               set({ players: filteredPlayers });
             }
           } else if (players.length > 0) {
-            // No game yet - initialize with players from room
-            console.log('🎮 Initializing game with', players.length, 'players from room');
-            const initialChips = playerData.chips || 20000;
-            get().initializeGame(initialChips, players);
+            // No game yet - but wait for at least 2 players before initializing
+            console.log('⏳ Room has', players.length, 'players, waiting for more...');
+            if (players.length >= 2) {
+              console.log('🎮 Initializing game with', players.length, 'players from room');
+              const initialChips = playerData.chips || 20000;
+              get().initializeGame(initialChips, players);
+            } else {
+              console.log('⏸️ Not enough players yet (need 2, have', players.length, '), waiting...');
+              // Set waiting state
+              set({ 
+                loading: false,
+                phase: 'waiting',
+                players: players.map(p => ({
+                  id: p.id,
+                  name: p.name,
+                  avatarURL: p.avatarURL || '/assets/boy.svg',
+                  chips: p.chips || 20000,
+                  roundStartChips: p.chips || 20000,
+                  roundEndChips: p.chips || 20000,
+                  currentRoundChipsInvested: 0,
+                  cards: [],
+                  showDownHand: { hand: [], descendingSortHand: [] },
+                  bet: 0,
+                  betReconciled: false,
+                  folded: false,
+                  allIn: false,
+                  canRaise: true,
+                  stackInvestment: 0,
+                  robot: false,
+                  isConnected: true
+                }))
+              });
+            }
           }
           
           // Update game state if available
