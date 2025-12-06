@@ -3,19 +3,20 @@
  */
 .chat-toggle-btn {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 12px 20px;
+  bottom: clamp(80px, 15vh, 120px);
+  right: clamp(15px, 3vw, 20px);
+  padding: clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px);
   background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
   border: 2px solid #FFFFFF;
-  border-radius: 25px;
+  border-radius: clamp(20px, 4vw, 25px);
   color: #FFFFFF;
-  font-size: 14px;
+  font-size: clamp(12px, 2vw, 14px);
   font-weight: bold;
   cursor: pointer;
-  z-index: 100;
+  z-index: 1001;
   box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .chat-toggle-btn:hover {

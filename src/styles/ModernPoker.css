@@ -282,27 +282,27 @@ body {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(26, 0, 0, 0.9) 100%);
   border-top: 3px solid var(--primary-blue);
   box-shadow: 0 -5px 30px var(--blue-glow);
-  padding: 15px 20px;
+  padding: clamp(12px, 2vw, 15px) clamp(15px, 3vw, 20px);
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: clamp(10px, 2vw, 20px);
   z-index: 1000;
   box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
   height: auto;
-  min-height: 80px;
-  max-height: 120px;
+  min-height: clamp(70px, 12vh, 80px);
+  max-height: clamp(100px, 18vh, 120px);
   backdrop-filter: blur(10px);
 }
 
 .modern-action-button {
-  padding: 15px 30px;
+  padding: clamp(12px, 2vw, 15px) clamp(20px, 4vw, 30px);
   background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
   border: 2px solid var(--neon-blue);
   box-shadow: var(--neon-shadow);
-  border-radius: 25px;
+  border-radius: clamp(15px, 3vw, 25px);
   color: var(--neon-white);
-  font-size: 18px;
+  font-size: clamp(14px, 2.5vw, 18px);
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -311,6 +311,8 @@ body {
   box-shadow: 0 0 20px var(--blue-glow);
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .modern-action-button::before {

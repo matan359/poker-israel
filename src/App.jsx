@@ -22,6 +22,7 @@ import Card from './components/cards/Card';
 import Spinner from './Spinner';
 import WinScreen from './WinScreen';
 import ErrorBoundary from './components/ErrorBoundary';
+import Store from './components/store/Store';
 
 // Utils
 import { renderShowdownMessages, renderActionButtonText, renderNetPlayerEarnings, renderActionMenu } from './utils/ui';
@@ -36,6 +37,7 @@ import './styles/ModernPoker.css';
 function GameTable() {
   const [showAuth, setShowAuth] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showStore, setShowStore] = useState(false);
   const [playerChatMessages, setPlayerChatMessages] = useState({}); // { playerId: { message, playerName, timestamp } } }
   const [showBonusWheel, setShowBonusWheel] = useState(false);
   const [dealerMessage, setDealerMessage] = useState('');
@@ -830,6 +832,8 @@ function GameTable() {
 
       <Chat socket={socket} roomId={roomId} isOpen={showChat} onToggle={() => setShowChat(!showChat)} />
 
+      <Store isOpen={showStore} onClose={() => setShowStore(false)} />
+
       <BonusWheel isOpen={showBonusWheel} onClose={() => setShowBonusWheel(false)} />
 
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
@@ -841,6 +845,11 @@ function GameTable() {
 // Lobby wrapper component with navigation
 function LobbyWrapper() {
   return <Lobby onJoinTable={() => {}} onCreateTable={() => {}} />;
+}
+
+// Store wrapper component
+function StoreWrapper() {
+  return <Store isOpen={true} onClose={() => window.location.href = '/lobby'} />;
 }
 
 function App() {

@@ -1,0 +1,98 @@
+.win-screen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 17, 34, 0.95) 100%);
+  position: relative;
+  z-index: 2000;
+}
+
+.win-screen-content {
+  text-align: center;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
+  border: 3px solid #00FFFF;
+  border-radius: 20px;
+  box-shadow: 
+    0 0 40px rgba(0, 255, 255, 0.8),
+    0 0 80px rgba(0, 102, 255, 0.5),
+    inset 0 0 30px rgba(0, 255, 255, 0.2);
+  animation: winScreenGlow 2s ease-in-out infinite;
+}
+
+@keyframes winScreenGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px rgba(0, 255, 255, 0.8),
+      0 0 80px rgba(0, 102, 255, 0.5),
+      inset 0 0 30px rgba(0, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 60px rgba(0, 255, 255, 1),
+      0 0 120px rgba(0, 102, 255, 0.7),
+      inset 0 0 40px rgba(0, 255, 255, 0.3);
+  }
+}
+
+.win-screen-title {
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 900;
+  color: #FFFFFF;
+  text-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.8),
+    0 0 40px rgba(0, 102, 255, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  margin: 0 0 20px 0;
+  letter-spacing: 2px;
+}
+
+.win-screen-container.out-of-chips .win-screen-title {
+  color: #FFD700;
+  text-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.8),
+    0 0 40px rgba(255, 165, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.win-screen-message {
+  font-size: clamp(20px, 4vw, 36px);
+  font-weight: 700;
+  color: #00FFFF;
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+  margin: 10px 0;
+}
+
+.win-screen-container.out-of-chips .win-screen-message {
+  color: #FFA500;
+  text-shadow: 0 0 15px rgba(255, 165, 0, 0.6);
+}
+
+.win-screen-subtitle {
+  font-size: clamp(16px, 3vw, 24px);
+  color: #FFFFFF;
+  margin-top: 20px;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .win-screen-content {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+  
+  .win-screen-title {
+    font-size: clamp(28px, 8vw, 48px);
+  }
+  
+  .win-screen-message {
+    font-size: clamp(18px, 5vw, 28px);
+  }
+  
+  .win-screen-subtitle {
+    font-size: clamp(14px, 4vw, 20px);
+  }
+}
+
