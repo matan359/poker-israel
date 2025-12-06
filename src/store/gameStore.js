@@ -409,18 +409,31 @@ const useGameStore = create((set, get) => ({
 
   handleAI: () => {
     const state = get();
+    if (!state.players || state.activePlayerIndex === null) {
+      console.warn('⚠️ Cannot handle AI - no players or activePlayerIndex');
+      return;
+    }
+    
     const newState = handleAIUtil(cloneDeep(state), (index, content) => {
       get().pushAnimationState(index, content);
     });
 
-    set({
-      ...newState,
-      betInputValue: newState.minBet,
-    });
+    if (newState && newState.players) {
+      console.log('🤖 AI action - new activePlayerIndex:', newState.activePlayerIndex, 'Phase:', newState.phase);
+      set({
+        ...newState,
+        betInputValue: newState.minBet || newState.betInputValue || 20,
+      });
+      
+      // Sync to Firestore
+      get().syncGameStateToFirestore(newState);
 
-    // Continue AI loop if needed
-    if (newState.players[newState.activePlayerIndex]?.robot && newState.phase !== 'showdown') {
-      setTimeout(() => get().handleAI(), 1200);
+      // Continue AI loop if needed
+      if (newState.players[newState.activePlayerIndex]?.robot && newState.phase !== 'showdown') {
+        setTimeout(() => get().handleAI(), 1200);
+      }
+    } else {
+      console.error('❌ AI handler returned invalid state');
     }
   },
 

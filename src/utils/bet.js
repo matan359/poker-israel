@@ -40,7 +40,7 @@ const handleBet = (state, bet, min, max) => {
 		state.highBet = bet;
 		state.minBet = state.highBet;
 		for (let player of state.players) {
-			if (!player.folded || !player.chips === 0) {
+			if (!player.folded && player.chips > 0) {
 				player.betReconciled = false;
 			}
 		}

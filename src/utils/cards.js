@@ -165,11 +165,21 @@ const dealPrivateCards = (state) => {
 }
 
 const dealFlop = (state) => {
+	if (!state.deck || state.deck.length < 3) {
+		console.error('No deck available or not enough cards for flop');
+		return state;
+	}
+	
 	// Clear previous community cards if any
 	state.communityCards = [];
 	
 	let animationDelay = 0;
 	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 3);
+	
+	if (!chosenCards || !Array.isArray(chosenCards) || chosenCards.length !== 3) {
+		console.error('Failed to pop 3 cards for flop');
+		return state;
+	}
 	
 	for (let card of chosenCards) {
 		card.animationDelay = animationDelay;
@@ -186,9 +196,18 @@ const dealFlop = (state) => {
 }
 
 const dealTurn = (state) => {
-	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
-	chosenCards.animationDelay = 0;
+	if (!state.deck || state.deck.length === 0) {
+		console.error('No deck available for turn');
+		return state;
+	}
 	
+	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
+	if (!chosenCards) {
+		console.error('Failed to pop card for turn');
+		return state;
+	}
+	
+	chosenCards.animationDelay = 0;
 	state.communityCards.push(chosenCards);
 	state.deck = mutableDeckCopy;
 	state = determinePhaseStartActivePlayer(state);
@@ -199,9 +218,18 @@ const dealTurn = (state) => {
 }
 
 const dealRiver = (state) => {
-	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
-	chosenCards.animationDelay = 0;
+	if (!state.deck || state.deck.length === 0) {
+		console.error('No deck available for river');
+		return state;
+	}
 	
+	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
+	if (!chosenCards) {
+		console.error('Failed to pop card for river');
+		return state;
+	}
+	
+	chosenCards.animationDelay = 0;
 	state.communityCards.push(chosenCards);
 	state.deck = mutableDeckCopy;
 	state = determinePhaseStartActivePlayer(state);
