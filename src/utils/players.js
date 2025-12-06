@@ -3,24 +3,50 @@ import { handlePhaseShift, reconcilePot, anteUpBlinds, determineBlindIndices } f
 import { dealMissingCommunityCards, showDown, generateDeckOfCards, shuffle, dealPrivateCards } from './cards.js';
 
 const axios = require('axios')
-// Generate table with only the human player - other players will join via Socket.io
+// Generate table with human player and robots if needed
 const generateTable = async (initialChips = 20000, existingPlayers = []) => {
 	// If there are existing players from Socket.io, use them
 	if (existingPlayers && existingPlayers.length > 0) {
-		return existingPlayers;
+		// If we have at least 2 players, use them as-is
+		if (existingPlayers.length >= 2) {
+			return existingPlayers;
+		}
+		// If we have only 1 player, add robots to make it at least 2 players
+		const robotsNeeded = 2 - existingPlayers.length;
+		const robots = [];
+		for (let i = 0; i < robotsNeeded; i++) {
+			const personality = generatePersonality(Math.random());
+			robots.push({
+				id: uuid(),
+				name: `Robot ${i + 1}`,
+				avatarURL: '/assets/boy.svg',
+				cards: [],
+				showDownHand: { hand: [], descendingSortHand: [] },
+				chips: initialChips,
+				roundStartChips: initialChips,
+				roundEndChips: initialChips,
+				currentRoundChipsInvested: 0,
+				bet: 0,
+				betReconciled: false,
+				folded: false,
+				allIn: false,
+				canRaise: true,
+				stackInvestment: 0,
+				robot: true,
+				personality: personality,
+				isConnected: false
+			});
+		}
+		return [...existingPlayers, ...robots];
 	}
 
-	// Otherwise, create just the human player
-	// Other players will join via Socket.io multiplayer
-	const users = [{
+	// No existing players - create human player + robots
+	const humanPlayer = {
 		id: uuid(),
 		name: 'Player 1',
 		avatarURL: '/assets/boy.svg',
 		cards: [],
-		showDownHand: {
-			hand: [],
-			descendingSortHand: [], 
-		},
+		showDownHand: { hand: [], descendingSortHand: [] },
 		chips: initialChips,
 		roundStartChips: initialChips,
 		roundEndChips: initialChips,
@@ -33,9 +59,31 @@ const generateTable = async (initialChips = 20000, existingPlayers = []) => {
 		stackInvestment: 0,
 		robot: false,
 		isConnected: true
-	}];
+	};
 
-	return users
+	// Add at least 1 robot to make it 2 players minimum
+	const robot = {
+		id: uuid(),
+		name: 'Robot 1',
+		avatarURL: '/assets/boy.svg',
+		cards: [],
+		showDownHand: { hand: [], descendingSortHand: [] },
+		chips: initialChips,
+		roundStartChips: initialChips,
+		roundEndChips: initialChips,
+		currentRoundChipsInvested: 0,
+		bet: 0,
+		betReconciled: false,
+		folded: false,
+		allIn: false,
+		canRaise: true,
+		stackInvestment: 0,
+		robot: true,
+		personality: generatePersonality(Math.random()),
+		isConnected: false
+	};
+
+	return [humanPlayer, robot];
 }
 
 const generatePersonality = (seed) => {
