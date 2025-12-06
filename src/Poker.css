@@ -790,6 +790,24 @@ img {
 		right: 20%;
 		left: unset;
 	}
+	
+	/* Mobile player positions */
+	.p0, .p1, .p4 {
+		bottom: 3% !important;
+	}
+	.p2, .p3 {
+		top: 30% !important;
+	}
+	
+	/* Mobile community cards */
+	.community-card-container {
+		top: 32% !important;
+	}
+	
+	/* Mobile dealer */
+	.dealer-container {
+		top: 1% !important;
+	}
 }
 
 @media (max-width: 736px) {
