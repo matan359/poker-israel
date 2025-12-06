@@ -17,12 +17,10 @@
 }
 
 .custom-alert {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   min-width: 400px;
   max-width: 600px;
+  width: 90%;
   background: linear-gradient(135deg, rgba(0, 17, 34, 0.98) 0%, rgba(0, 51, 102, 0.98) 100%);
   border: 3px solid #00FFFF;
   border-radius: 25px;
@@ -36,6 +34,7 @@
   z-index: 9999;
   direction: rtl;
   overflow: hidden;
+  margin: auto;
 }
 
 .custom-alert::before {
