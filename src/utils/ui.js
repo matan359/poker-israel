@@ -16,8 +16,12 @@ const renderPhaseStatement = (phase) => {
 		case('initialDeal'): return 'Dealing out the cards';
 		case('preflop'):
 		case('betting1'): return 'Preflop';
-		case('flop'): return 'Flop';
-		case('betting2'): return 'Flop';
+		case('flop'): return 'The Flop';
+		case('betting2'): return 'Flop Betting Round';
+		case('turn'): return 'The Turn';
+		case('betting3'): return 'Turn Betting Round';
+		case('river'): return 'The River';
+		case('betting4'): return 'River Betting Round';
 		case('turn'): return 'Turn';
 		case('betting3'): return 'Turn';
 		case('river'): return 'River';
@@ -131,7 +135,7 @@ const renderActionMenu = (highBet, players, activePlayerIndex, phase, changeSlid
 	const max = players[activePlayerIndex].chips + players[activePlayerIndex].bet
 	const sliderFn = changeSliderInput || changeSliderInputFn;
 	return(
-		(phase === 'betting1' || phase === 'betting2' || phase === 'betting3' || phase === 'betting4' || phase === 'preflop' || phase === 'flop' || phase === 'turn' || phase === 'river') ? (players[activePlayerIndex].robot) ? (<h4> {`Current Move: ${players[activePlayerIndex].name}`}</h4>) : (
+		(phase === 'betting1' || phase === 'betting2' || phase === 'betting3' || phase === 'betting4' || phase === 'preflop' || phase === 'flop' || phase === 'turn' || phase === 'river') ? (players[activePlayerIndex]?.robot) ? (<h4> {`Current Move: ${players[activePlayerIndex].name}`}</h4>) : (
 			<React.Fragment>
 			<Slider
 				rootStyle={sliderStyle}

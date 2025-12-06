@@ -885,13 +885,14 @@ const useGameStore = create((set, get) => ({
           highBet: gameState.highBet,
           phase: gameState.phase,
           activePlayerIndex: gameState.activePlayerIndex,
-          communityCards: gameState.communityCards,
+          communityCards: gameState.communityCards || [], // CRITICAL: Sync community cards
           dealerIndex: gameState.dealerIndex,
           blindIndex: gameState.blindIndex,
           lastUpdate: new Date().toISOString()
         },
         lastUpdate: new Date().toISOString()
       });
+      console.log('💾 Synced game state to Firestore - Phase:', gameState.phase, 'Community cards:', gameState.communityCards?.length || 0);
     } catch (error) {
       console.error('Error syncing game state to Firestore:', error);
     }

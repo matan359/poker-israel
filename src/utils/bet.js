@@ -71,25 +71,42 @@ const handleFold = (state) => {
 }
 
 const handlePhaseShift = (state) => {
+	console.log('🔄 Phase shift from:', state.phase);
+	
 	switch(state.phase) {
 		case('preflop'):
 		case('betting1'): {
-			state.phase = 'flop';
-			return dealFlop(reconcilePot(state));
+			const newState = dealFlop(reconcilePot(state));
+			// After dealing flop, set phase to 'betting2' for the betting round
+			newState.phase = 'betting2';
+			console.log('✅ Shifted to flop, phase set to betting2');
+			return newState;
 		}
+		case('flop'):
 		case('betting2'): {
-			state.phase = 'turn';
-			return dealTurn(reconcilePot(state));
+			const newState = dealTurn(reconcilePot(state));
+			newState.phase = 'betting3';
+			console.log('✅ Shifted to turn, phase set to betting3');
+			return newState;
 		}
+		case('turn'):
 		case('betting3'): {
-			state.phase = 'river'
-			return dealRiver(reconcilePot(state));
+			const newState = dealRiver(reconcilePot(state));
+			newState.phase = 'betting4';
+			console.log('✅ Shifted to river, phase set to betting4');
+			return newState;
 		}
+		case('river'):
 		case('betting4'): {
-			state.phase = 'showdown'
-			return showDown(reconcilePot(state));
+			const newState = showDown(reconcilePot(state));
+			newState.phase = 'showdown';
+			console.log('✅ Shifted to showdown');
+			return newState;
 		}
-		default: throw Error("handlePhaseShift() called from non-betting phase")
+		default: {
+			console.error('❌ handlePhaseShift() called from invalid phase:', state.phase);
+			throw Error("handlePhaseShift() called from non-betting phase: " + state.phase);
+		}
 	}
 }
 

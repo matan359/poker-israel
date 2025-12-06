@@ -136,44 +136,50 @@ const dealPrivateCards = (state) => {
 }
 
 const dealFlop = (state) => {
+	// Clear previous community cards if any
+	state.communityCards = [];
+	
 	let animationDelay = 0;
 	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 3);
-		
-		for (let card of chosenCards) {
-			card.animationDelay = animationDelay;
-			animationDelay = animationDelay + 250;
-			state.communityCards.push(card);
-		}
+	
+	for (let card of chosenCards) {
+		card.animationDelay = animationDelay;
+		animationDelay = animationDelay + 250;
+		state.communityCards.push(card);
+	}
 
-		state.deck = mutableDeckCopy;
-		state = determinePhaseStartActivePlayer(state)
-		state.phase = 'betting2';
-			
-		return state;
+	state.deck = mutableDeckCopy;
+	state = determinePhaseStartActivePlayer(state);
+	state.phase = 'flop'; // Set to 'flop' first, then 'betting2' after betting round
+	console.log('🃏 Flop dealt:', state.communityCards.length, 'cards');
+	
+	return state;
 }
 
 const dealTurn = (state) => {
 	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
 	chosenCards.animationDelay = 0;
-		
+	
 	state.communityCards.push(chosenCards);
 	state.deck = mutableDeckCopy;
-	state = determinePhaseStartActivePlayer(state)
-	state.phase = 'betting3'
-
-		return state
+	state = determinePhaseStartActivePlayer(state);
+	state.phase = 'turn'; // Set to 'turn' first
+	console.log('🃏 Turn dealt, total community cards:', state.communityCards.length);
+	
+	return state;
 }
 
 const dealRiver = (state) => {
 	const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
 	chosenCards.animationDelay = 0;
-		
-		state.communityCards.push(chosenCards);
-		state.deck = mutableDeckCopy;
-		state = determinePhaseStartActivePlayer(state)
-		state.phase = 'betting4'
-
-			return state
+	
+	state.communityCards.push(chosenCards);
+	state.deck = mutableDeckCopy;
+	state = determinePhaseStartActivePlayer(state);
+	state.phase = 'river'; // Set to 'river' first
+	console.log('🃏 River dealt, total community cards:', state.communityCards.length);
+	
+	return state;
 }
 
 const showDown = (state) => {
