@@ -239,10 +239,17 @@ const useGameStore = create((set, get) => ({
     
     const newState = dealPrivateCards(cloneDeep(state));
     if (newState && newState.players) {
-      console.log('🎮 Cards dealt, activePlayerIndex:', newState.activePlayerIndex, 'Phase:', newState.phase);
+      // Verify cards were dealt
+      const cardsDealt = newState.players.every(p => p.cards && p.cards.length === 2);
+      if (!cardsDealt) {
+        console.error('❌ Cards not dealt correctly!', newState.players.map(p => ({ name: p.name, cards: p.cards?.length || 0 })));
+      }
+      
+      console.log('🎮 Cards dealt, activePlayerIndex:', newState.activePlayerIndex, 'Phase:', newState.phase, 'Cards dealt:', cardsDealt);
       set(newState);
       
       // CRITICAL: Sync game state to Firestore after dealing cards
+      // Note: Cards are NOT synced to Firestore for security
       get().syncGameStateToFirestore(newState);
       
       // Auto-handle AI players after a short delay
