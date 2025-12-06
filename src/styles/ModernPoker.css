@@ -434,24 +434,34 @@ body {
 
 @media (max-width: 768px) {
   .game-top-bar {
-    height: auto;
-    min-height: 60px;
+    height: 45px;
+    min-height: 45px;
     flex-direction: column;
-    padding: 10px 15px;
-    gap: 10px;
+    padding: 8px 15px;
+    gap: 8px;
   }
   
   .game-logo-container {
     order: -1;
+    transform: scale(1.1);
   }
   
   .game-user-info {
+    padding: 5px 12px;
     font-size: 12px;
   }
   
+  .game-username {
+    font-size: 11px;
+  }
+  
+  .game-chips {
+    font-size: 10px;
+  }
+  
   .game-back-btn {
-    padding: 8px 15px;
-    font-size: 12px;
+    padding: 6px 14px;
+    font-size: 11px;
   }
 }
 
@@ -615,13 +625,17 @@ body {
   }
   
   .modern-timer {
-    top: 80px;
+    top: 55px;
     right: 10px;
-    padding: 10px 15px;
+    padding: 8px 12px;
+  }
+  
+  .modern-timer-label {
+    font-size: 9px;
   }
   
   .modern-timer-value {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .modern-community-cards {
