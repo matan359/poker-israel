@@ -81,6 +81,9 @@ const useGameStore = create((set, get) => ({
     try {
       console.log('Starting game initialization...');
       
+      // Reset winnerFound when starting a new game
+      set({ winnerFound: null });
+      
       // Use provided chips or default to 20000
       const startingChips = initialChips || 20000;
       
