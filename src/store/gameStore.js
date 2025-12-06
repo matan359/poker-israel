@@ -239,7 +239,11 @@ const useGameStore = create((set, get) => ({
     
     const newState = dealPrivateCards(cloneDeep(state));
     if (newState && newState.players) {
+      console.log('🎮 Cards dealt, activePlayerIndex:', newState.activePlayerIndex, 'Phase:', newState.phase);
       set(newState);
+      
+      // CRITICAL: Sync game state to Firestore after dealing cards
+      get().syncGameStateToFirestore(newState);
       
       // Auto-handle AI players after a short delay
       setTimeout(() => {
@@ -369,6 +373,7 @@ const useGameStore = create((set, get) => ({
     }
     
     const newState = handleFold(cloneDeep(state));
+    console.log('🎯 Fold action - new activePlayerIndex:', newState.activePlayerIndex);
     set(newState);
 
     // Broadcast action to other players via Socket.io
@@ -381,7 +386,7 @@ const useGameStore = create((set, get) => ({
       });
     }
 
-    // Also sync via Firestore
+    // CRITICAL: Sync game state to Firestore immediately
     get().syncGameStateToFirestore(newState);
 
     // Auto-handle AI
@@ -819,14 +824,25 @@ const useGameStore = create((set, get) => ({
             }
           }
           
-          // Update game state if available
+          // Update game state if available - CRITICAL: Sync activePlayerIndex
           if (roomData.gameState) {
             const currentState = get();
-            set({
+            const syncedState = {
               ...roomData.gameState,
               loading: currentState.loading,
               playerAnimationSwitchboard: currentState.playerAnimationSwitchboard
-            });
+            };
+            
+            // Ensure activePlayerIndex is valid
+            if (syncedState.activePlayerIndex !== null && 
+                syncedState.activePlayerIndex !== undefined &&
+                syncedState.players && 
+                syncedState.players[syncedState.activePlayerIndex]) {
+              console.log('🔄 Syncing game state from Firestore - activePlayerIndex:', syncedState.activePlayerIndex);
+              set(syncedState);
+            } else {
+              console.warn('⚠️ Invalid activePlayerIndex from Firestore, keeping current state');
+            }
           }
         } else {
           console.log('⚠️ Room does not exist yet');
