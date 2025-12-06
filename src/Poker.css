@@ -892,20 +892,20 @@ img {
 	
 	/* Mobile player positions */
 	.p0, .p1, .p4 {
-		bottom: 3% !important;
+		bottom: 2% !important;
 	}
 	.p2, .p3 {
-		top: 30% !important;
+		top: 28% !important;
 	}
 	
 	/* Mobile community cards */
 	.community-card-container {
-		top: 32% !important;
+		top: 28% !important;
 	}
 	
 	/* Mobile dealer */
 	.dealer-container {
-		top: 0.3% !important;
+		top: -10px !important;
 	}
 	
 	/* Mobile - larger chip display */
