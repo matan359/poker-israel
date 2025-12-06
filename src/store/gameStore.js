@@ -369,13 +369,27 @@ const useGameStore = create((set, get) => ({
       return;
     }
     
-    // Check if the active player is the current user
-    if (activePlayer.id !== userProfile.uid && !activePlayer.robot) {
+    // Check if the active player is the current user (or allow auto-fold from timer)
+    const isAutoFold = !activePlayer.robot && activePlayer.id === userProfile.uid;
+    const isManualFold = activePlayer.id === userProfile.uid || activePlayer.robot;
+    
+    if (!isAutoFold && !isManualFold) {
       console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', userProfile.uid);
       return; // Don't allow action if it's not the current user's turn
     }
     
     const newState = handleFold(cloneDeep(state));
+    
+    // Update lastActionRound for the player who just folded
+    const currentRound = state.currentRound || 1;
+    if (newState.players && newState.players[state.activePlayerIndex]) {
+      // Find the player who folded (might be different index after fold)
+      const foldedPlayer = newState.players.find(p => p.id === activePlayer.id);
+      if (foldedPlayer) {
+        foldedPlayer.lastActionRound = currentRound;
+      }
+    }
+    
     console.log('🎯 Fold action - new activePlayerIndex:', newState.activePlayerIndex);
     set(newState);
 
@@ -460,9 +474,14 @@ const useGameStore = create((set, get) => ({
       const timeRemaining = get().turnTimeRemaining;
       if (timeRemaining <= 0) {
         get().stopTurnTimer();
-        // Auto-fold if time expires
+        // Auto-fold if time expires - CRITICAL: Only for human players
         const state = get();
-        if (!state.players[state.activePlayerIndex]?.robot) {
+        const activePlayer = state.players && state.activePlayerIndex !== null 
+          ? state.players[state.activePlayerIndex] 
+          : null;
+        
+        if (activePlayer && !activePlayer.robot && !activePlayer.folded && state.phase !== 'showdown') {
+          console.log('⏰ Time expired for', activePlayer.name, '- auto-folding');
           get().handleFold();
         }
       } else {
