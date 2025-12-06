@@ -253,8 +253,13 @@ function GameTable() {
               const roomRef = doc(db, 'game_rooms', tableId);
               const roomSnap = await getDoc(roomRef);
               if (roomSnap.exists()) {
-                roomPlayers = roomSnap.data().players || [];
-                console.log(`👥 Found ${roomPlayers.length} players in room ${tableId}:`, roomPlayers.map(p => p.name));
+                const roomData = roomSnap.data();
+                roomPlayers = (roomData && roomData.players) ? roomData.players : [];
+                if (roomPlayers && roomPlayers.length > 0) {
+                  console.log(`👥 Found ${roomPlayers.length} players in room ${tableId}:`, roomPlayers.map(p => p?.name || 'Unknown'));
+                } else {
+                  console.log(`⏳ Room ${tableId} exists but has no players yet`);
+                }
               } else {
                 console.log(`⏳ Room ${tableId} doesn't exist yet, waiting...`);
               }
@@ -263,16 +268,16 @@ function GameTable() {
             }
           }
           
-          const allPlayers = roomPlayers.length > 0 ? roomPlayers : (currentPlayers || []);
-          console.log(`🔄 Attempt ${attempts}/${maxAttempts}: Found ${allPlayers.length} players`);
+          const allPlayers = (roomPlayers && roomPlayers.length > 0) ? roomPlayers : (currentPlayers || []);
+          console.log(`🔄 Attempt ${attempts}/${maxAttempts}: Found ${allPlayers ? allPlayers.length : 0} players`);
           
           // CRITICAL: Only start if we have at least 2 players OR we've waited too long
-          if (allPlayers.length >= 2) {
+          if (allPlayers && allPlayers.length >= 2) {
             clearInterval(waitForPlayers);
             console.log(`✅ Starting game with ${allPlayers.length} players!`);
             
-            // Convert players to game format
-            const existingPlayers = allPlayers.map(p => ({
+            // Convert players to game format - ensure all players have required fields
+            const existingPlayers = allPlayers.filter(p => p && p.id).map(p => ({
               id: p.id,
               name: p.name,
               avatarURL: p.avatarURL || '/assets/boy.svg',
@@ -303,11 +308,11 @@ function GameTable() {
               });
           } else if (attempts >= maxAttempts) {
             clearInterval(waitForPlayers);
-            console.warn(`⚠️ Timeout: Starting game with only ${allPlayers.length} player(s)`);
+            console.warn(`⚠️ Timeout: Starting game with only ${allPlayers ? allPlayers.length : 0} player(s)`);
             
             // Start with what we have (will show waiting message)
-            const existingPlayers = allPlayers.length > 0 
-              ? allPlayers.map(p => ({
+            const existingPlayers = (allPlayers && allPlayers.length > 0) 
+              ? allPlayers.filter(p => p && p.id).map(p => ({
                   id: p.id,
                   name: p.name,
                   avatarURL: p.avatarURL || '/assets/boy.svg',
@@ -437,6 +442,7 @@ function GameTable() {
   };
 
   const renderCommunityCards = (purgeAnimation = false) => {
+    if (!communityCards || !Array.isArray(communityCards)) return null;
     return communityCards.map((card, index) => {
       let cardData = { ...card };
       if (purgeAnimation) {
@@ -469,9 +475,10 @@ function GameTable() {
     if (!playerHierarchy || playerHierarchy.length === 0) return null;
 
     return playerHierarchy.map((rankSnapshot, index) => {
+      if (!rankSnapshot) return null;
       const tie = Array.isArray(rankSnapshot);
       return tie ? (
-        <div key={index}>{rankSnapshot.map((player) => renderRankWinner(player))}</div>
+        <div key={index}>{(rankSnapshot || []).map((player) => player ? renderRankWinner(player) : null)}</div>
       ) : (
         renderRankWinner(rankSnapshot)
       );
