@@ -695,7 +695,7 @@ function GameTable() {
       {/* Top Bar with Logo */}
       <div className="game-top-bar">
         <div className="game-logo-container">
-          <PokerIsraelLogo size="small" />
+          <PokerIsraelLogo size="medium" />
         </div>
         {(() => {
           // Find the current player (Player 1) in the game
