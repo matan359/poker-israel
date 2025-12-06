@@ -289,18 +289,16 @@ const useGameStore = create((set, get) => ({
 
   handleBetInputSubmit: (bet, min, max) => {
     const state = get();
-    const { playerAnimationSwitchboard, activePlayerIndex, socket, roomId, userProfile } = state;
+    const { playerAnimationSwitchboard, activePlayerIndex, socket, roomId } = state;
     
     // CRITICAL: Only allow action if this is the current user's turn
+    const authStoreModule = require('./authStore');
+    const authState = authStoreModule.default.getState();
+    const userProfile = authState.userProfile;
+    
     if (!userProfile) {
-      // Try to get userProfile from authStore
-      const authStoreModule = require('./authStore');
-      const authState = authStoreModule.default.getState();
-      if (!authState.userProfile) {
-        console.error('Cannot perform action: user not authenticated');
-        return;
-      }
-      state.userProfile = authState.userProfile;
+      console.error('Cannot perform action: user not authenticated');
+      return;
     }
     
     const activePlayer = state.players[activePlayerIndex];
@@ -310,8 +308,8 @@ const useGameStore = create((set, get) => ({
     }
     
     // Check if the active player is the current user
-    if (activePlayer.id !== state.userProfile.uid && !activePlayer.robot) {
-      console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', state.userProfile.uid);
+    if (activePlayer.id !== userProfile.uid && !activePlayer.robot) {
+      console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', userProfile.uid);
       return; // Don't allow action if it's not the current user's turn
     }
     
@@ -346,18 +344,16 @@ const useGameStore = create((set, get) => ({
 
   handleFold: () => {
     const state = get();
-    const { socket, roomId, userProfile } = state;
+    const { socket, roomId } = state;
     
     // CRITICAL: Only allow action if this is the current user's turn
+    const authStoreModule = require('./authStore');
+    const authState = authStoreModule.default.getState();
+    const userProfile = authState.userProfile;
+    
     if (!userProfile) {
-      // Try to get userProfile from authStore
-      const authStoreModule = require('./authStore');
-      const authState = authStoreModule.default.getState();
-      if (!authState.userProfile) {
-        console.error('Cannot perform action: user not authenticated');
-        return;
-      }
-      state.userProfile = authState.userProfile;
+      console.error('Cannot perform action: user not authenticated');
+      return;
     }
     
     const activePlayer = state.players[state.activePlayerIndex];
@@ -367,8 +363,8 @@ const useGameStore = create((set, get) => ({
     }
     
     // Check if the active player is the current user
-    if (activePlayer.id !== state.userProfile.uid && !activePlayer.robot) {
-      console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', state.userProfile.uid);
+    if (activePlayer.id !== userProfile.uid && !activePlayer.robot) {
+      console.warn('Not your turn! Active player:', activePlayer.name, 'Your ID:', userProfile.uid);
       return; // Don't allow action if it's not the current user's turn
     }
     
