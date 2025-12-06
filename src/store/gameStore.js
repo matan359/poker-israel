@@ -141,15 +141,13 @@ const useGameStore = create((set, get) => ({
       });
 
       console.log('Starting game loop...');
-      // Start game loop after state is set
-      setTimeout(() => {
-        const currentState = get();
-        if (currentState.players && currentState.players.length > 0) {
-          get().runGameLoop();
-        } else {
-          console.error('No players available for game loop');
-        }
-      }, 200);
+      // Start game loop IMMEDIATELY - no delay needed
+      const currentState = get();
+      if (currentState.players && currentState.players.length > 0) {
+        get().runGameLoop();
+      } else {
+        console.error('No players available for game loop');
+      }
       
       return Promise.resolve();
     } catch (error) {

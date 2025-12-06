@@ -235,9 +235,9 @@ function GameTable() {
           }
         }
         
-        // Wait for at least 2 players - CRITICAL for multiplayer
+        // Wait for players - but start quickly if we have at least 1 player (will add robots)
         let attempts = 0;
-        const maxAttempts = 30; // Wait up to 30 seconds for players to join
+        const maxAttempts = 3; // Wait only 3 seconds (3 attempts) - start fast!
         
         const waitForPlayers = setInterval(async () => {
           attempts++;
@@ -272,19 +272,20 @@ function GameTable() {
           const allPlayers = (roomPlayers && roomPlayers.length > 0) ? roomPlayers : (currentPlayers || []);
           console.log(`🔄 Attempt ${attempts}/${maxAttempts}: Found ${allPlayers ? allPlayers.length : 0} players`);
           
-          // CRITICAL: Only start if we have at least 2 players OR we've waited too long
-          if (allPlayers && allPlayers.length >= 2) {
+          // CRITICAL: Start immediately if we have at least 1 player (generateTable will add robots)
+          // OR if we have 2+ players, OR if we've waited too long
+          if (allPlayers && allPlayers.length >= 1) {
             clearInterval(waitForPlayers);
-            console.log(`✅ Starting game with ${allPlayers.length} players!`);
+            console.log(`✅ Starting game with ${allPlayers.length} player(s)!`);
             
             // Convert players to game format - ensure all players have required fields
             const existingPlayers = allPlayers.filter(p => p && p.id).map(p => ({
               id: p.id,
               name: p.name,
               avatarURL: p.avatarURL || '/assets/boy.svg',
-              chips: p.chips || 20000,
-              roundStartChips: p.chips || 20000,
-              roundEndChips: p.chips || 20000,
+              chips: (typeof p.chips === 'number' && !isNaN(p.chips)) ? p.chips : (p.totalChips && typeof p.totalChips === 'number' && !isNaN(p.totalChips)) ? p.totalChips : 20000,
+              roundStartChips: (typeof p.chips === 'number' && !isNaN(p.chips)) ? p.chips : (p.totalChips && typeof p.totalChips === 'number' && !isNaN(p.totalChips)) ? p.totalChips : 20000,
+              roundEndChips: (typeof p.chips === 'number' && !isNaN(p.chips)) ? p.chips : (p.totalChips && typeof p.totalChips === 'number' && !isNaN(p.totalChips)) ? p.totalChips : 20000,
               currentRoundChipsInvested: 0,
               cards: [],
               showDownHand: { hand: [], descendingSortHand: [] },
@@ -309,43 +310,12 @@ function GameTable() {
               });
           } else if (attempts >= maxAttempts) {
             clearInterval(waitForPlayers);
-            console.warn(`⚠️ Timeout: Starting game with only ${allPlayers ? allPlayers.length : 0} player(s)`);
+            console.warn(`⚠️ Timeout: Starting game anyway (will add robots if needed)`);
             
-            // Start with what we have (will show waiting message)
-            const existingPlayers = (allPlayers && allPlayers.length > 0) 
-              ? allPlayers.filter(p => p && p.id).map(p => {
-                  // Ensure chips is a valid number
-                  const playerChips = (typeof p.chips === 'number' && !isNaN(p.chips))
-                    ? p.chips
-                    : (p.totalChips && typeof p.totalChips === 'number' && !isNaN(p.totalChips))
-                      ? p.totalChips
-                      : 20000;
-                  
-                  return {
-                    id: p.id,
-                    name: p.name,
-                    avatarURL: p.avatarURL || '/assets/boy.svg',
-                    chips: playerChips,
-                    roundStartChips: playerChips,
-                    roundEndChips: playerChips,
-                    currentRoundChipsInvested: 0,
-                    cards: [],
-                    showDownHand: { hand: [], descendingSortHand: [] },
-                    bet: 0,
-                    betReconciled: false,
-                    folded: false,
-                    allIn: false,
-                    canRaise: true,
-                    stackInvestment: 0,
-                    robot: false,
-                    isConnected: true
-                  };
-                })
-              : null;
-            
-            initializeGame(initialChips, existingPlayers)
+            // Start with current user - generateTable will add robots
+            initializeGame(initialChips, null)
               .then(() => {
-                console.log('Game initialized (timeout)');
+                console.log('Game initialized (timeout - with robots)');
                 setGameInitialized(true);
               })
               .catch((error) => {
