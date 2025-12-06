@@ -912,16 +912,22 @@ img {
 	/* Mobile - larger chip display */
 	.player-info--stash--container,
 	.player-info--bet--container {
-		font-size: 18px !important;
-		gap: 10px !important;
-		padding: 6px 10px !important;
+		font-size: clamp(16px, 4vw, 20px) !important;
+		gap: clamp(8px, 2vw, 12px) !important;
+		padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px) !important;
 		z-index: 30 !important;
 	}
 	
 	.player-info--stash--image,
 	.player-info--bet--image {
-		height: 32px !important;
-		width: 32px !important;
+		height: clamp(28px, 6vw, 36px) !important;
+		width: clamp(28px, 6vw, 36px) !important;
+	}
+	
+	/* Responsive cards on mobile */
+	.playing-card {
+		height: clamp(50px, 10vh, 70px) !important;
+		width: clamp(35px, 7vw, 50px) !important;
 	}
 }
 
