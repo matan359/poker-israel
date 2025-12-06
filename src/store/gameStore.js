@@ -830,12 +830,33 @@ const useGameStore = create((set, get) => ({
           }
           
           // Update game state if available - CRITICAL: Sync activePlayerIndex
+          // BUT: Don't overwrite cards - they're not synced for security
           if (roomData.gameState) {
             const currentState = get();
+            
+            // Preserve cards from current state - they're not synced to Firestore for security
+            const currentPlayersWithCards = currentState.players || [];
+            const syncedPlayers = roomData.gameState.players || [];
+            
+            // Merge: use synced player data but keep cards from current state
+            const mergedPlayers = syncedPlayers.map((syncedPlayer, index) => {
+              const currentPlayer = currentPlayersWithCards.find(p => p.id === syncedPlayer.id);
+              return {
+                ...syncedPlayer,
+                // CRITICAL: Keep cards from current state (not synced for security)
+                cards: currentPlayer?.cards || syncedPlayer.cards || [],
+                showDownHand: currentPlayer?.showDownHand || syncedPlayer.showDownHand || { hand: [], descendingSortHand: [] }
+              };
+            });
+            
             const syncedState = {
               ...roomData.gameState,
+              players: mergedPlayers,
               loading: currentState.loading,
-              playerAnimationSwitchboard: currentState.playerAnimationSwitchboard
+              playerAnimationSwitchboard: currentState.playerAnimationSwitchboard,
+              // Preserve deck and cards-related state
+              deck: currentState.deck || roomData.gameState.deck,
+              clearCards: currentState.clearCards || false
             };
             
             // Ensure activePlayerIndex is valid
@@ -843,7 +864,7 @@ const useGameStore = create((set, get) => ({
                 syncedState.activePlayerIndex !== undefined &&
                 syncedState.players && 
                 syncedState.players[syncedState.activePlayerIndex]) {
-              console.log('🔄 Syncing game state from Firestore - activePlayerIndex:', syncedState.activePlayerIndex);
+              console.log('🔄 Syncing game state from Firestore - activePlayerIndex:', syncedState.activePlayerIndex, 'Players with cards:', syncedState.players.map(p => ({ name: p.name, cards: p.cards?.length || 0 })));
               set(syncedState);
             } else {
               console.warn('⚠️ Invalid activePlayerIndex from Firestore, keeping current state');

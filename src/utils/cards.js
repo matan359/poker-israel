@@ -105,29 +105,58 @@ const dealPrivateCards = (state) => {
 		return state;
 	}
 	
+	if (!state.deck || state.deck.length === 0) {
+		console.error('No deck available to deal cards');
+		return state;
+	}
+	
 	state.clearCards = false;
 	let animationDelay = 0;
 	
-	// Deal 2 cards to each player
+	// Initialize cards array for all players
 	for (let i = 0; i < state.players.length; i++) {
-		const playerIndex = (state.activePlayerIndex + i) % state.players.length;
-		// Safety check: ensure player and cards array exist
-		if (!state.players[playerIndex] || !state.players[playerIndex].cards) {
-			state.players[playerIndex].cards = [];
+		if (!state.players[i].cards) {
+			state.players[i].cards = [];
 		}
-		while (state.players[playerIndex].cards.length < 2) {
+		// Clear existing cards if any
+		state.players[i].cards = [];
+	}
+	
+	// Deal 2 cards to each player starting from dealer
+	// In poker, cards are dealt one at a time, starting from the player to the left of the dealer
+	const startIndex = state.dealerIndex !== null && state.dealerIndex !== undefined 
+		? state.dealerIndex 
+		: 0;
+	
+	console.log('🃏 Dealing cards starting from dealer index:', startIndex, 'Deck size:', state.deck.length);
+	
+	// Deal first card to each player
+	for (let round = 0; round < 2; round++) {
+		for (let i = 0; i < state.players.length; i++) {
+			const playerIndex = (startIndex + i) % state.players.length;
+			
+			if (state.deck.length === 0) {
+				console.error('Deck is empty! Cannot deal more cards');
+				break;
+			}
+			
 			const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
+			
+			if (!chosenCards) {
+				console.error('Failed to pop card from deck');
+				break;
+			}
 			
 			// Can export to a separate function - as it will be used in many places
 			chosenCards.animationDelay = animationDelay;
 			animationDelay = animationDelay + 250;
 
-			const newDeck = [...mutableDeckCopy];
 			state.players[playerIndex].cards.push(chosenCards);
-
-			state.deck = newDeck;
+			state.deck = mutableDeckCopy;
 		}
 	}
+	
+	console.log('🃏 Cards dealt. Player cards:', state.players.map(p => ({ name: p.name, cards: p.cards?.length || 0 })));
 	
 	// Set active player to first player after big blind
 	state.activePlayerIndex = handleOverflowIndex(state.blindIndex.big, 1, state.players.length, 'up');
