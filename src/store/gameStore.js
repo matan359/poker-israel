@@ -564,22 +564,49 @@ const useGameStore = create((set, get) => ({
           // Room exists - add player if not already there
           const roomData = roomSnap.data();
           const existingPlayers = roomData.players || [];
-          const playerExists = existingPlayers.find(p => p.id === playerData.id);
+          
+          // Clean up stale players (not active for more than 5 minutes)
+          const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+          const activePlayers = existingPlayers.filter(p => {
+            if (!p.lastSeen) return true; // Keep players without timestamp
+            const lastSeen = new Date(p.lastSeen).getTime();
+            return lastSeen > fiveMinutesAgo;
+          });
+          
+          const playerExists = activePlayers.find(p => p.id === playerData.id);
           
           if (!playerExists) {
             console.log('➕ Adding player to existing room:', playerData.name);
+            // Add timestamp to player data
+            const playerWithTimestamp = {
+              ...playerData,
+              lastSeen: new Date().toISOString()
+            };
             await updateDoc(roomRef, {
-              players: arrayUnion(playerData),
+              players: [...activePlayers, playerWithTimestamp],
               lastUpdate: new Date().toISOString()
             });
           } else {
-            console.log('✅ Player already in room:', playerData.name);
+            // Update lastSeen timestamp
+            const updatedPlayers = activePlayers.map(p => 
+              p.id === playerData.id 
+                ? { ...p, lastSeen: new Date().toISOString() }
+                : p
+            );
+            await updateDoc(roomRef, {
+              players: updatedPlayers,
+              lastUpdate: new Date().toISOString()
+            });
+            console.log('✅ Player already in room, updated timestamp:', playerData.name);
           }
         } else {
           // Create new room
           console.log('🆕 Creating new room with player:', playerData.name);
           await setDoc(roomRef, {
-            players: [playerData],
+            players: [{
+              ...playerData,
+              lastSeen: new Date().toISOString()
+            }],
             gameState: null,
             createdAt: new Date().toISOString(),
             status: 'waiting',
@@ -606,29 +633,56 @@ const useGameStore = create((set, get) => ({
       const unsubscribe = onSnapshot(roomRef, (snapshot) => {
         if (snapshot.exists()) {
           const roomData = snapshot.data();
-          console.log('🔥 Firestore room update - players:', roomData.players?.length || 0, roomData.players);
+          
+          // Clean up stale players (not active for more than 5 minutes)
+          const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+          const allPlayers = roomData.players || [];
+          const activePlayers = allPlayers.filter(p => {
+            if (!p.lastSeen) return true; // Keep players without timestamp
+            const lastSeen = new Date(p.lastSeen).getTime();
+            return lastSeen > fiveMinutesAgo;
+          });
+          
+          // Update timestamp for current user
+          const authStore = await import('./authStore');
+          const { userProfile } = authStore.default.getState();
+          const updatedPlayers = activePlayers.map(p => {
+            if (p.id === userProfile?.uid) {
+              return { ...p, lastSeen: new Date().toISOString() };
+            }
+            return p;
+          });
+          
+          // If we filtered out stale players, update Firestore
+          if (updatedPlayers.length !== allPlayers.length) {
+            updateDoc(roomRef, {
+              players: updatedPlayers,
+              lastUpdate: new Date().toISOString()
+            }).catch(err => console.error('Error cleaning stale players:', err));
+          }
+          
+          console.log('🔥 Firestore room update - active players:', updatedPlayers.length, 'out of', allPlayers.length);
           
           // Update connected players
-          const players = roomData.players || [];
-          set({ connectedPlayers: players });
+          set({ connectedPlayers: updatedPlayers });
           
           // Update game players
           const { players: gamePlayers, phase } = get();
           
           if (gamePlayers && gamePlayers.length > 0) {
             // Game is already running - merge players
-            const updatedPlayers = [...gamePlayers];
+            const mergedPlayers = [...gamePlayers];
             let hasNewPlayers = false;
             
-            players.forEach(roomPlayer => {
+            updatedPlayers.forEach(roomPlayer => {
               const existingIndex = updatedPlayers.findIndex(p => p.id === roomPlayer.id);
               if (existingIndex !== -1) {
                 // Update existing player
-                updatedPlayers[existingIndex] = {
-                  ...updatedPlayers[existingIndex],
+                mergedPlayers[existingIndex] = {
+                  ...mergedPlayers[existingIndex],
                   name: roomPlayer.name,
-                  avatarURL: roomPlayer.avatarURL || updatedPlayers[existingIndex].avatarURL,
-                  chips: roomPlayer.chips || updatedPlayers[existingIndex].chips,
+                  avatarURL: roomPlayer.avatarURL || mergedPlayers[existingIndex].avatarURL,
+                  chips: roomPlayer.chips || mergedPlayers[existingIndex].chips,
                   isConnected: true
                 };
               } else if (!roomPlayer.robot) {
@@ -637,7 +691,7 @@ const useGameStore = create((set, get) => ({
                 // If game hasn't started yet (loading/waiting phase), add player as active
                 // If game is in progress, add them but they'll join next round
                 const isGameInProgress = phase && phase !== 'loading' && phase !== 'waiting' && phase !== 'initialDeal';
-                updatedPlayers.push({
+                mergedPlayers.push({
                   id: roomPlayer.id,
                   name: roomPlayer.name,
                   avatarURL: roomPlayer.avatarURL || '/assets/boy.svg',
@@ -661,14 +715,14 @@ const useGameStore = create((set, get) => ({
             });
             
             // Remove players that left (but keep robots)
-            const playerIds = players.map(p => p.id);
-            const filteredPlayers = updatedPlayers.filter(p => playerIds.includes(p.id) || p.robot);
+            const playerIds = updatedPlayers.map(p => p.id);
+            const filteredPlayers = mergedPlayers.filter(p => playerIds.includes(p.id) || p.robot);
             
-            if (hasNewPlayers || filteredPlayers.length !== updatedPlayers.length) {
+            if (hasNewPlayers || filteredPlayers.length !== mergedPlayers.length) {
               console.log('🔄 Updating game players:', filteredPlayers.length, 'players');
               set({ players: filteredPlayers });
             }
-          } else if (players.length > 0) {
+          } else if (updatedPlayers.length > 0) {
             // No game yet - but wait for at least 2 players before initializing
             console.log('⏳ Room has', players.length, 'players, waiting for more...');
             if (players.length >= 2) {
@@ -787,7 +841,7 @@ const useGameStore = create((set, get) => ({
     // Remove player from Firestore room
     if (roomId) {
       try {
-        const { doc, getDoc, updateDoc, arrayRemove } = await import('firebase/firestore');
+        const { doc, getDoc, updateDoc } = await import('firebase/firestore');
         const { db } = await import('../config/firebase');
         const roomRef = doc(db, 'game_rooms', roomId);
         const roomSnap = await getDoc(roomRef);
@@ -799,11 +853,12 @@ const useGameStore = create((set, get) => ({
           // Find current user's player data
           const { userProfile } = await import('./authStore').then(m => m.default.getState());
           if (userProfile) {
-            // Remove player from room
-            const playerToRemove = currentPlayers.find(p => p.id === userProfile.uid);
-            if (playerToRemove) {
+            // Remove player from room by filtering out the current user
+            const updatedPlayers = currentPlayers.filter(p => p.id !== userProfile.uid);
+            
+            if (updatedPlayers.length !== currentPlayers.length) {
               await updateDoc(roomRef, {
-                players: arrayRemove(playerToRemove),
+                players: updatedPlayers,
                 lastUpdate: new Date().toISOString()
               });
               console.log('✅ Removed player from room:', userProfile.uid);
