@@ -18,6 +18,7 @@ const Player = (props) => {
     isActive,
     phase,
     clearCards,
+    isCurrentUser = false, // Is this the current user's player?
     player: {
       robot,
       folded,
@@ -51,22 +52,31 @@ const Player = (props) => {
       applyFoldedClassname = true
     }
 
-    if (robot) {
+    // Show cards only if:
+    // 1. This is the current user's player, OR
+    // 2. It's a robot and we're in showdown, OR
+    // 3. It's showdown phase (all cards visible)
+    const shouldShowCards = isCurrentUser || phase === 'showdown';
+
+    if (robot || !isCurrentUser) {
+      // For robots or other players: show hidden cards unless showdown
       return cards.map((card, index)=> {
-        if (phase !== 'showdown') {
-          return(
-            <HiddenCard key={index} cardData={card} applyFoldedClassname={applyFoldedClassname}/>
-          );
-        } else {
-          // Reset Animation Delay
-          const cardData = {...card, animationDelay: 0}
+        if (shouldShowCards) {
+          // Show actual cards in showdown or if it's the current user
+          const cardData = {...card, animationDelay: phase === 'showdown' ? 0 : card.animationDelay}
           return(
             <Card key={index} cardData={cardData} applyFoldedClassname={applyFoldedClassname}/>
+          );
+        } else {
+          // Show hidden cards for other players/robots
+          return(
+            <HiddenCard key={index} cardData={card} applyFoldedClassname={applyFoldedClassname}/>
           );
         }
       });
     }
     else {
+      // Current user's cards - always show
       return cards.map((card, index) => {
         return(
           <Card key={index} cardData={card} applyFoldedClassname={applyFoldedClassname}/>

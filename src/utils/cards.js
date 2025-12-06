@@ -131,7 +131,7 @@ const dealPrivateCards = (state) => {
 	
 	// Set active player to first player after big blind
 	state.activePlayerIndex = handleOverflowIndex(state.blindIndex.big, 1, state.players.length, 'up');
-	state.phase = 'betting1';
+	state.phase = 'preflop'; // Changed from 'betting1' to 'preflop' for clarity
 	return state;
 }
 

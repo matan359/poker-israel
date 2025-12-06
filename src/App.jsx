@@ -442,9 +442,14 @@ function GameTable() {
   const renderBoard = () => {
     if (!players) return null;
 
+    // Get current user's ID to identify which player is "me"
+    const currentUserId = userProfile?.uid;
+
     return players.map((player, index) => {
       const isActive = index === activePlayerIndex;
       const hasDealerChip = index === dealerIndex;
+      // Check if this is the current user's player
+      const isCurrentUser = player.id === currentUserId;
 
       return (
         <Player
@@ -457,6 +462,7 @@ function GameTable() {
           phase={phase}
           playerAnimationSwitchboard={playerAnimationSwitchboard}
           endTransition={popAnimationState}
+          isCurrentUser={isCurrentUser}
         />
       );
     });

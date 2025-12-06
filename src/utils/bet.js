@@ -72,6 +72,7 @@ const handleFold = (state) => {
 
 const handlePhaseShift = (state) => {
 	switch(state.phase) {
+		case('preflop'):
 		case('betting1'): {
 			state.phase = 'flop';
 			return dealFlop(reconcilePot(state));
