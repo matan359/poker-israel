@@ -267,90 +267,42 @@ const Lobby = ({ onJoinTable, onCreateTable }) => {
 
   useEffect(() => {
     // Load connected users from users collection (users who are online)
+    let roomsUnsubscribe = null;
+    let usersUnsubscribe = null;
+    
     const loadConnectedUsers = async () => {
       try {
-        const { collection, onSnapshot, query, where, orderBy, limit } = await import('firebase/firestore');
+        const { collection, onSnapshot, query, orderBy, limit } = await import('firebase/firestore');
         const { db } = await import('../../config/firebase');
         const usersRef = collection(db, 'users');
         
-        // Try to load users who are online or recently active
-        // First, try to get users from game rooms
-        try {
-          const roomsRef = collection(db, 'game_rooms');
-          const roomsUnsubscribe = onSnapshot(roomsRef, (snapshot) => {
-            const allUsers = new Map();
-            
-            snapshot.docs.forEach(doc => {
-              const roomData = doc.data();
-              const players = roomData.players || [];
-              players.forEach(player => {
-                if (player.id && !allUsers.has(player.id)) {
-                  allUsers.set(player.id, {
-                    id: player.id,
-                    username: player.name || player.username || 'שחקן',
-                    totalChips: player.chips || player.totalChips || 0
-                  });
-                }
-              });
-            });
-            
-            // Also load from users collection
-            const usersUnsubscribe = onSnapshot(
-              query(usersRef, orderBy('gameHistory.lastLogin', 'desc'), limit(10)),
-              (usersSnapshot) => {
-                usersSnapshot.docs.forEach(doc => {
-                  const userData = doc.data();
-                  if (userData.uid && !allUsers.has(userData.uid)) {
-                    // Check if user was active in last 5 minutes
-                    const lastLogin = userData.gameHistory?.lastLogin;
-                    if (lastLogin) {
-                      const lastLoginTime = new Date(lastLogin);
-                      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-                      if (lastLoginTime > fiveMinutesAgo) {
-                        allUsers.set(userData.uid, {
-                          id: userData.uid,
-                          username: userData.username || 'שחקן',
-                          totalChips: userData.totalChips || 0
-                        });
-                      }
-                    }
-                  }
+        // Load users from game rooms (most reliable - shows who is actually playing)
+        const roomsRef = collection(db, 'game_rooms');
+        roomsUnsubscribe = onSnapshot(roomsRef, (snapshot) => {
+          const allUsers = new Map();
+          
+          snapshot.docs.forEach(doc => {
+            const roomData = doc.data();
+            const players = roomData.players || [];
+            players.forEach(player => {
+              if (player.id && !allUsers.has(player.id)) {
+                allUsers.set(player.id, {
+                  id: player.id,
+                  username: player.name || player.username || 'שחקן',
+                  totalChips: player.chips || player.totalChips || 0
                 });
-                
-                setConnectedUsers(Array.from(allUsers.values()).slice(0, 10));
               }
-            );
-            
-            setConnectedUsers(Array.from(allUsers.values()).slice(0, 10));
-            
-            return () => {
-              roomsUnsubscribe();
-              usersUnsubscribe();
-            };
+            });
           });
           
-          return () => roomsUnsubscribe();
-        } catch (roomsError) {
-          console.warn('Could not load from game_rooms, trying users only:', roomsError);
-          
-          // Fallback: load from users collection only
-          const usersUnsubscribe = onSnapshot(
-            query(usersRef, orderBy('gameHistory.lastLogin', 'desc'), limit(10)),
-            (usersSnapshot) => {
-              const users = usersSnapshot.docs.map(doc => {
-                const userData = doc.data();
-                return {
-                  id: userData.uid || doc.id,
-                  username: userData.username || 'שחקן',
-                  totalChips: userData.totalChips || 0
-                };
-              });
-              setConnectedUsers(users);
-            }
-          );
-          
-          return () => usersUnsubscribe();
-        }
+          // Update connected users immediately from game_rooms
+          setConnectedUsers(Array.from(allUsers.values()).slice(0, 20));
+        }, (error) => {
+          console.error('Error loading from game_rooms:', error);
+        });
+        
+        // Note: We primarily use game_rooms to show connected users
+        // Users collection is less reliable for real-time status
       } catch (error) {
         console.error('Error loading connected users:', error);
         // Fallback: show current user if available
@@ -367,6 +319,16 @@ const Lobby = ({ onJoinTable, onCreateTable }) => {
     if (isAuthenticated) {
       loadConnectedUsers();
     }
+    
+    // Cleanup
+    return () => {
+      if (roomsUnsubscribe) {
+        roomsUnsubscribe();
+      }
+      if (usersUnsubscribe) {
+        usersUnsubscribe();
+      }
+    };
   }, [isAuthenticated, userProfile]);
 
   const handleJoinTable = async (table) => {

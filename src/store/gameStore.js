@@ -567,13 +567,17 @@ const useGameStore = create((set, get) => ({
           const playerExists = existingPlayers.find(p => p.id === playerData.id);
           
           if (!playerExists) {
+            console.log('➕ Adding player to existing room:', playerData.name);
             await updateDoc(roomRef, {
               players: arrayUnion(playerData),
               lastUpdate: new Date().toISOString()
             });
+          } else {
+            console.log('✅ Player already in room:', playerData.name);
           }
         } else {
           // Create new room
+          console.log('🆕 Creating new room with player:', playerData.name);
           await setDoc(roomRef, {
             players: [playerData],
             gameState: null,
@@ -602,17 +606,19 @@ const useGameStore = create((set, get) => ({
       const unsubscribe = onSnapshot(roomRef, (snapshot) => {
         if (snapshot.exists()) {
           const roomData = snapshot.data();
-          console.log('Firestore room update:', roomData);
+          console.log('🔥 Firestore room update - players:', roomData.players?.length || 0, roomData.players);
           
           // Update connected players
           const players = roomData.players || [];
           set({ connectedPlayers: players });
           
           // Update game players
-          const { players: gamePlayers } = get();
-          if (gamePlayers) {
-            // Merge existing players with new ones
+          const { players: gamePlayers, phase } = get();
+          
+          if (gamePlayers && gamePlayers.length > 0) {
+            // Game is already running - merge players
             const updatedPlayers = [...gamePlayers];
+            let hasNewPlayers = false;
             
             players.forEach(roomPlayer => {
               const existingIndex = updatedPlayers.findIndex(p => p.id === roomPlayer.id);
@@ -625,8 +631,9 @@ const useGameStore = create((set, get) => ({
                   chips: roomPlayer.chips || updatedPlayers[existingIndex].chips,
                   isConnected: true
                 };
-              } else {
-                // Add new player
+              } else if (!roomPlayer.robot) {
+                // Add new real player (not robot)
+                hasNewPlayers = true;
                 updatedPlayers.push({
                   id: roomPlayer.id,
                   name: roomPlayer.name,
@@ -639,23 +646,28 @@ const useGameStore = create((set, get) => ({
                   showDownHand: { hand: [], descendingSortHand: [] },
                   bet: 0,
                   betReconciled: false,
-                  folded: false,
+                  folded: phase === 'showdown' ? false : true, // Fold new players if game is in progress
                   allIn: false,
                   canRaise: true,
                   stackInvestment: 0,
                   robot: false,
                   isConnected: true,
                 });
+                console.log('✅ Added new player to game:', roomPlayer.name);
               }
             });
             
-            // Remove players that left
+            // Remove players that left (but keep robots)
             const playerIds = players.map(p => p.id);
             const filteredPlayers = updatedPlayers.filter(p => playerIds.includes(p.id) || p.robot);
             
-            set({ players: filteredPlayers });
+            if (hasNewPlayers || filteredPlayers.length !== updatedPlayers.length) {
+              console.log('🔄 Updating game players:', filteredPlayers.length, 'players');
+              set({ players: filteredPlayers });
+            }
           } else if (players.length > 0) {
-            // Initialize game with players from room
+            // No game yet - initialize with players from room
+            console.log('🎮 Initializing game with', players.length, 'players from room');
             const initialChips = playerData.chips || 20000;
             get().initializeGame(initialChips, players);
           }
@@ -669,7 +681,11 @@ const useGameStore = create((set, get) => ({
               playerAnimationSwitchboard: currentState.playerAnimationSwitchboard
             });
           }
+        } else {
+          console.log('⚠️ Room does not exist yet');
         }
+      }, (error) => {
+        console.error('❌ Error in Firestore snapshot:', error);
       });
 
       // Store unsubscribe function

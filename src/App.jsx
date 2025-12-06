@@ -125,8 +125,21 @@ function GameTable() {
         });
 
         newSocket.on('connect_error', (error) => {
-          console.warn('Socket connection error (will continue with local game):', error);
-          // Continue with local game if Socket.io server is not available
+          console.warn('Socket connection error (will continue with Firestore):', error);
+          // Join room via Firestore if Socket.io fails
+          const urlParams = new URLSearchParams(window.location.search);
+          const tableParam = urlParams.get('table');
+          const tableId = tableParam || `default_room_${window.location.pathname}`;
+          
+          const playerData = {
+            id: userProfile.uid,
+            name: userProfile.username,
+            avatarURL: userProfile.avatarURL || '/assets/boy.svg',
+            chips: userProfile.totalChips || 20000
+          };
+          
+          console.log('Joining room via Firestore:', tableId, 'as player:', playerData.name);
+          joinRoom(tableId, playerData);
         });
 
         return () => {
@@ -135,10 +148,51 @@ function GameTable() {
           }
         };
       } catch (error) {
-        console.warn('Socket.io not available, continuing with local game:', error);
+        console.warn('Socket.io not available, using Firestore only:', error);
+        // Join room via Firestore if Socket.io is not available
+        const urlParams = new URLSearchParams(window.location.search);
+        const tableParam = urlParams.get('table');
+        const tableId = tableParam || `default_room_${window.location.pathname}`;
+        
+        const playerData = {
+          id: userProfile.uid,
+          name: userProfile.username,
+          avatarURL: userProfile.avatarURL || '/assets/boy.svg',
+          chips: userProfile.totalChips || 20000
+        };
+        
+        console.log('Joining room via Firestore (no Socket.io):', tableId, 'as player:', playerData.name);
+        joinRoom(tableId, playerData);
       }
     }
   }, [isAuthenticated, userProfile, socket, setSocket, joinRoom]);
+
+  // Also join room via Firestore if we're on a game page (backup method)
+  useEffect(() => {
+    if (isAuthenticated && userProfile && window.location.pathname === '/game') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tableParam = urlParams.get('table');
+      if (tableParam) {
+        // Wait a bit to see if Socket.io will connect, then join via Firestore
+        const timeout = setTimeout(() => {
+          const { roomId } = useGameStore.getState();
+          // Only join if we haven't joined yet
+          if (!roomId || roomId !== tableParam) {
+            const playerData = {
+              id: userProfile.uid,
+              name: userProfile.username,
+              avatarURL: userProfile.avatarURL || '/assets/boy.svg',
+              chips: userProfile.totalChips || 20000
+            };
+            console.log('Joining room via Firestore (backup):', tableParam, 'as player:', playerData.name);
+            joinRoom(tableParam, playerData);
+          }
+        }, 2000); // Wait 2 seconds for Socket.io to connect
+        
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [isAuthenticated, userProfile, joinRoom]);
 
   // Initialize game when component mounts
   useEffect(() => {
