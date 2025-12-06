@@ -4,7 +4,7 @@
  */
 .dealer-container {
   position: absolute;
-  top: 5%;
+  top: 2%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
@@ -107,18 +107,19 @@
 .dealer-tip-button {
   position: absolute;
   top: 50%;
-  right: -80px;
-  transform: translateY(-50%);
-  padding: 6px 12px;
-  background: linear-gradient(135deg, rgba(0, 17, 34, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 80px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.95) 0%, rgba(0, 51, 102, 0.95) 100%);
   border: 1.5px solid #00FFFF;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #FFFFFF;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
   pointer-events: auto;
   z-index: 60;
   white-space: nowrap;

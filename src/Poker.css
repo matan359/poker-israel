@@ -280,29 +280,29 @@ img {
 
  /* Player positions around the table - better spacing */
  .p0 {
- 	bottom: 8%;
+ 	bottom: 5%;
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 15;
  }
  .p1 {
- 	bottom: 8%;
+ 	bottom: 5%;
  	left: 20%;
 	z-index: 15;
  }
  .p2 {
- 	top: 20%;
+ 	top: 25%;
  	left: 8%;
 	z-index: 15;
  }
 
  .p4 {
- 	bottom: 8%;
+ 	bottom: 5%;
  	right: 20%;
 	z-index: 15;
  }
  .p3 {
- 	top: 20%;
+ 	top: 25%;
  	right: 8%;
 	z-index: 15;
  }
@@ -324,7 +324,7 @@ img {
  	align-items: center;
  	flex-wrap: nowrap;
 
- 	top: 42%;
+ 	top: 35%;
  	left: 50%;
  	transform: translateX(-50%);
  	

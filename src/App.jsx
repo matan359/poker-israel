@@ -36,6 +36,7 @@ import './styles/ModernPoker.css';
 function GameTable() {
   const [showAuth, setShowAuth] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [playerChatMessages, setPlayerChatMessages] = useState({}); // { playerId: { message, playerName, timestamp } } }
   const [showBonusWheel, setShowBonusWheel] = useState(false);
   const [dealerMessage, setDealerMessage] = useState('');
   const [isAnnouncing, setIsAnnouncing] = useState(false);
@@ -123,6 +124,29 @@ function GameTable() {
           
           console.log('Joining room:', tableId, 'as player:', playerData.name);
           joinRoom(tableId, playerData);
+        });
+
+        // Listen for chat messages and display them above players
+        newSocket.on('chatMessage', (data) => {
+          if (data && data.playerId && data.message) {
+            setPlayerChatMessages(prev => ({
+              ...prev,
+              [data.playerId]: {
+                message: data.message,
+                playerName: data.playerName || 'Player',
+                timestamp: Date.now()
+              }
+            }));
+            
+            // Auto-remove message after 3 seconds
+            setTimeout(() => {
+              setPlayerChatMessages(prev => {
+                const updated = { ...prev };
+                delete updated[data.playerId];
+                return updated;
+              });
+            }, 3000);
+          }
         });
 
         newSocket.on('connect_error', (error) => {

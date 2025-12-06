@@ -4,6 +4,7 @@ import Card from '../cards/Card';
 import HiddenCard from '../cards/HiddenCard';
 
 import PlayerStatusNotificationBox from "./PlayerStatusNotificationBox";
+import PlayerChatBubble from "./PlayerChatBubble";
 import { calculateHandStrength } from '../../utils/handStrength';
 
 const dealerChipImageURL = "/assets/chip.svg";
@@ -21,6 +22,7 @@ const Player = (props) => {
     clearCards,
     isCurrentUser = false, // Is this the current user's player?
     communityCards = [], // Community cards for hand strength calculation
+    chatMessage = null, // Chat message to display above player
     player: {
       robot,
       folded,
@@ -28,7 +30,8 @@ const Player = (props) => {
       avatarURL,
       name,
       chips,
-      bet
+      bet,
+      id
     }
   } = props;
 
@@ -108,6 +111,14 @@ const Player = (props) => {
       </div>
       <div className="player-entity--container">
         <div className="player-avatar--container">
+          {/* Chat bubble above player */}
+          {chatMessage && (
+            <PlayerChatBubble 
+              message={chatMessage.message} 
+              playerName={chatMessage.playerName}
+              duration={3000}
+            />
+          )}
           <img 
             className={`player-avatar--image${(isActive ? ' activePlayer' : '')}`} 
             src={avatarURL} 
