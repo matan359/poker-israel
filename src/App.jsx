@@ -379,8 +379,20 @@ function GameTable() {
       if (gameState.roundHouseRake && gameState.roundHouseRake > 0) {
         recordHouseProfit(gameState.roundHouseRake, pot || 0, `round_${Date.now()}`);
       }
+      
+      // Auto-start next round after 5 seconds (show results, then continue)
+      const autoNextRoundTimer = setTimeout(() => {
+        const currentState = useGameStore.getState();
+        // Only auto-start if still in showdown and no winner found
+        if (currentState.phase === 'showdown' && !currentState.winnerFound) {
+          console.log('🔄 Auto-starting next round...');
+          handleNextRound();
+        }
+      }, 5000); // 5 seconds to show results
+      
+      return () => clearTimeout(autoNextRoundTimer);
     }
-  }, [phase, players, userProfile, isAuthenticated, updateChipsAfterRound, recordHouseProfit, pot]);
+  }, [phase, players, userProfile, isAuthenticated, updateChipsAfterRound, recordHouseProfit, pot, handleNextRound]);
 
   useEffect(() => {
     if (!isAuthenticated && !loading) {

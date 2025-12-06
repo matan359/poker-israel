@@ -76,3 +76,4 @@ const CustomAlert = ({ isOpen, message, type = 'info', onClose, title }) => {
 export default CustomAlert;
 
 
+
