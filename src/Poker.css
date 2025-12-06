@@ -813,6 +813,40 @@ img {
 	transform: translateY(-2px) scale(1.05);
 }
 
+/* Mobile Responsive for Showdown */
+@media (max-width: 768px) {
+	.showdown-player--entity {
+		padding: 8px;
+		height: auto;
+		min-height: 100px;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.showdown-player--entity.showdown-winner {
+		border-width: 2px;
+		box-shadow: 
+			0 0 15px rgba(78, 176, 78, 0.5),
+			inset 0 0 10px rgba(78, 176, 78, 0.1);
+	}
+
+	.showdown-player--entity.showdown-loser {
+		border-width: 2px;
+		box-shadow: 
+			0 0 10px rgba(151, 36, 27, 0.3),
+			inset 0 0 8px rgba(151, 36, 27, 0.1);
+	}
+
+	.showdown--nextRound--button {
+		padding: 10px 20px;
+		font-size: 14px;
+		margin: 15px auto;
+		z-index: 2001;
+		position: sticky;
+		bottom: 20px;
+	}
+}
+
 @media (min-width: 1080px) {
 	.poker-table--container {
 		position: relative;
