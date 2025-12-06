@@ -272,54 +272,83 @@ const Admin = ({ isOpen, onClose }) => {
               <div className="admin-users-section" style={{ marginTop: '30px', paddingTop: '30px', borderTop: '2px solid #333' }}>
                 <h3>ניהול משתמשים</h3>
                 <div className="admin-setting-item">
-                  <label>הפוך משתמש לאדמין (לפי אימייל)</label>
+                  <label>הפוך משתמש לאדמין (לפי אימייל או UID)</label>
                   <button 
                     onClick={async () => {
-                      const email = await showPrompt('הזן אימייל של המשתמש להפוך לאדמין:', 'הפוך לאדמין', 'matanyou7@gmail.com', 'email');
-                      if (!email) return;
+                      const input = await showPrompt('הזן אימייל או UID של המשתמש להפוך לאדמין:', 'הפוך לאדמין', '', 'text');
+                      if (!input) return;
                       
                       try {
                         setLoading(true);
-                        // Find user by email
                         const usersRef = collection(db, 'users');
-                        const q = query(usersRef, where('email', '==', email));
-                        const snapshot = await getDocs(q);
                         
-                        if (snapshot.empty) {
-                          // Try to find by uid if email not found
-                          const allUsers = await getDocs(usersRef);
-                          const userDoc = Array.from(allUsers.docs).find(doc => {
-                            const data = doc.data();
-                            return data.email === email || doc.id === email;
-                          });
-                          
-                          if (userDoc) {
-                            await updateDoc(doc(db, 'users', userDoc.id), {
-                              isAdmin: true,
-                              email: email
-                            });
-                            await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
-                          } else {
-                            await showAlert(`משתמש עם אימייל ${email} לא נמצא`, 'error', 'שגיאה');
+                        // Try to find by email first
+                        let userDoc = null;
+                        try {
+                          const q = query(usersRef, where('email', '==', input));
+                          const snapshot = await getDocs(q);
+                          if (!snapshot.empty) {
+                            userDoc = snapshot.docs[0];
                           }
-                        } else {
-                          // Update first matching user
-                          const userDoc = snapshot.docs[0];
-                          await updateDoc(doc(db, 'users', userDoc.id), {
-                            isAdmin: true
+                        } catch (e) {
+                          console.log('Email query failed, trying UID...');
+                        }
+                        
+                        // If not found by email, try by UID (document ID)
+                        if (!userDoc) {
+                          try {
+                            const userRef = doc(db, 'users', input);
+                            const userSnap = await getDoc(userRef);
+                            if (userSnap.exists()) {
+                              userDoc = userSnap;
+                            }
+                          } catch (e) {
+                            console.log('UID lookup failed');
+                          }
+                        }
+                        
+                        // If still not found, search all users
+                        if (!userDoc) {
+                          const allUsers = await getDocs(usersRef);
+                          userDoc = Array.from(allUsers.docs).find(doc => {
+                            const data = doc.data();
+                            return data.email === input || 
+                                   data.uid === input || 
+                                   doc.id === input ||
+                                   data.username === input;
                           });
-                          await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                        }
+                        
+                        if (userDoc) {
+                          const userId = userDoc.id || userDoc.ref?.id;
+                          const userData = userDoc.data ? userDoc.data() : {};
+                          
+                          await updateDoc(doc(db, 'users', userId), {
+                            isAdmin: true,
+                            email: userData.email || input
+                          });
+                          await showAlert(
+                            `משתמש הופך לאדמין בהצלחה!\n${userData.username || userData.email || input}\nרענן את הדף כדי לראות את הכפתור ADMIN.`,
+                            'success',
+                            'הצלחה!'
+                          );
+                        } else {
+                          await showAlert(
+                            `משתמש לא נמצא.\n\nנסה:\n1. אימייל מלא\n2. UID של המשתמש\n3. ודא שהמשתמש נרשם קודם`,
+                            'warning',
+                            'משתמש לא נמצא'
+                          );
                         }
                       } catch (error) {
                         console.error('Error making user admin:', error);
-                        await showAlert(`שגיאה בהפיכת משתמש לאדמין: ${error.message}`, 'error', 'שגיאה');
+                        await showAlert(`שגיאה: ${error.message}`, 'error', 'שגיאה');
                       } finally {
                         setLoading(false);
                       }
                     }}
                     disabled={loading}
                   >
-                    הפוך לאדמין
+                    הפוך משתמש לאדמין
                   </button>
                 </div>
                 <div className="admin-setting-item" style={{ marginTop: '10px' }}>
@@ -346,7 +375,7 @@ const Admin = ({ isOpen, onClose }) => {
                               isAdmin: true,
                               email: email
                             });
-                            await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                            await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!\nרענן את הדף כדי לראות את הכפתור ADMIN.`, 'success', 'הצלחה!');
                           } else {
                             await showAlert(`משתמש ${email} לא נמצא. ודא שהמשתמש נרשם קודם.`, 'warning', 'אזהרה');
                           }
@@ -355,7 +384,7 @@ const Admin = ({ isOpen, onClose }) => {
                           await updateDoc(doc(db, 'users', userDoc.id), {
                             isAdmin: true
                           });
-                          await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                          await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!\nרענן את הדף כדי לראות את הכפתור ADMIN.`, 'success', 'הצלחה!');
                         }
                       } catch (error) {
                         console.error('Error making user admin:', error);
@@ -369,6 +398,18 @@ const Admin = ({ isOpen, onClose }) => {
                   >
                     הפוך את matanyou7@gmail.com לאדמין
                   </button>
+                </div>
+                <div className="admin-setting-item" style={{ marginTop: '20px', padding: '15px', backgroundColor: '#1a1a2e', borderRadius: '8px' }}>
+                  <p style={{ color: '#fff', fontSize: '14px', margin: '0 0 10px 0' }}>
+                    <strong>💡 טיפ:</strong> אם אין לך משתמש אדמין, עדכן ישירות ב-Firebase Console:
+                  </p>
+                  <ol style={{ color: '#ccc', fontSize: '12px', margin: '0', paddingLeft: '20px' }}>
+                    <li>פתח Firebase Console → Firestore Database</li>
+                    <li>מצא את הקולקציה <code>users</code></li>
+                    <li>לחץ על המשתמש שלך</li>
+                    <li>הוסף שדה: <code>isAdmin: true</code></li>
+                    <li>ראה את המדריך המלא ב-<code>MAKE_USER_ADMIN.md</code></li>
+                  </ol>
                 </div>
               </div>
               
