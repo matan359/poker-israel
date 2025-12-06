@@ -439,11 +439,18 @@ const useGameStore = create((set, get) => ({
       return;
     }
 
+    console.log('🔄 Starting next round - Phase:', newState.phase, 'ActivePlayer:', newState.activePlayerIndex);
     set(newState);
+    
+    // CRITICAL: Sync game state to Firestore after starting new round
+    get().syncGameStateToFirestore(newState);
 
-    // Auto-handle AI
-    if (newState.players[newState.activePlayerIndex]?.robot && newState.phase !== 'showdown') {
-      setTimeout(() => get().handleAI(), 1200);
+    // Auto-handle AI if it's AI's turn
+    if (newState.players && 
+        newState.activePlayerIndex !== null &&
+        newState.players[newState.activePlayerIndex]?.robot && 
+        newState.phase !== 'showdown') {
+      setTimeout(() => get().handleAI(), 500);
     }
   },
 
