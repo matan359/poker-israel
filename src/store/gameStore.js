@@ -114,9 +114,15 @@ const useGameStore = create((set, get) => ({
       const playersBoughtIn = anteUpBlinds(players, blindIndicies, 20);
 
       console.log('Setting game state...');
+      // Initialize lastActionRound for all players
+      const playersWithTracking = playersBoughtIn.map(player => ({
+        ...player,
+        lastActionRound: 0 // Start at round 0, will be updated when they act
+      }));
+      
       set({
         loading: false,
-        players: playersBoughtIn,
+        players: playersWithTracking,
         numPlayersActive: players.length,
         numPlayersFolded: 0,
         numPlayersAllIn: 0,
@@ -131,6 +137,7 @@ const useGameStore = create((set, get) => ({
         highBet: 20,
         betInputValue: 20,
         phase: 'initialDeal',
+        currentRound: 1, // Track current round number
       });
 
       console.log('Starting game loop...');
