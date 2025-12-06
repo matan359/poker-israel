@@ -454,6 +454,7 @@ function GameTable() {
           playerAnimationSwitchboard={playerAnimationSwitchboard}
           endTransition={popAnimationState}
           isCurrentUser={isCurrentUser}
+          communityCards={communityCards}
         />
       );
     });

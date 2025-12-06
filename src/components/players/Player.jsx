@@ -4,6 +4,7 @@ import Card from '../cards/Card';
 import HiddenCard from '../cards/HiddenCard';
 
 import PlayerStatusNotificationBox from "./PlayerStatusNotificationBox";
+import { calculateHandStrength } from '../../utils/handStrength';
 
 const dealerChipImageURL = "/assets/chip.svg";
 const chipCountImageURL = "/assets/chips.svg";
