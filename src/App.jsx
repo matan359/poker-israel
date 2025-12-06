@@ -1,0 +1,797 @@
+/**
+ * Modern Poker App - Main Component
+ * Integrates all features: authentication, multiplayer, economy, dealer, chat, etc.
+ */
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import useGameStore from './store/gameStore';
+import useAuthStore from './store/authStore';
+import useEconomyStore from './store/economyStore';
+
+// Components
+import AuthModal from './components/auth/AuthModal';
+import LoginPage from './components/auth/LoginPage';
+import Lobby from './components/lobby/Lobby';
+import Dealer from './components/dealer/Dealer';
+import Chat from './components/chat/Chat';
+import BonusWheel from './components/economy/BonusWheel';
+import PokerIsraelLogo from './components/logo/PokerIsraelLogo';
+import Player from './components/players/Player';
+import ShowdownPlayer from './components/players/ShowdownPlayer';
+import Card from './components/cards/Card';
+import Spinner from './Spinner';
+import WinScreen from './WinScreen';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Utils
+import { renderShowdownMessages, renderActionButtonText, renderNetPlayerEarnings, renderActionMenu } from './utils/ui';
+import { determineMinBet } from './utils/bet';
+import { showAlert } from './utils/dialogs';
+
+// Styles
+import './App.css';
+import './Poker.css';
+import './styles/ModernPoker.css';
+
+function GameTable() {
+  const [showAuth, setShowAuth] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [showBonusWheel, setShowBonusWheel] = useState(false);
+  const [dealerMessage, setDealerMessage] = useState('');
+  const [isAnnouncing, setIsAnnouncing] = useState(false);
+  const [gameInitialized, setGameInitialized] = useState(false);
+
+  const {
+    loading,
+    winnerFound,
+    players,
+    activePlayerIndex,
+    dealerIndex,
+    communityCards,
+    pot,
+    highBet,
+    betInputValue,
+    phase,
+    playerHierarchy,
+    showDownMessages,
+    playerAnimationSwitchboard,
+    clearCards,
+    socket,
+    roomId,
+    connectedPlayers,
+    turnTimeRemaining,
+    timerActive,
+    initializeGame,
+    handleBetInputChange,
+    changeSliderInput,
+    handleBetInputSubmit,
+    handleFold,
+    handleNextRound,
+    pushAnimationState,
+    popAnimationState,
+    startTurnTimer,
+    stopTurnTimer,
+    setSocket,
+    joinRoom,
+  } = useGameStore();
+
+  const { isAuthenticated, userProfile, initAuth, updateChipsAfterRound } = useAuthStore();
+  const { initEconomy, dailyBonusAvailable, claimDailyBonus, tipDealer, recordHouseProfit } = useEconomyStore();
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      initEconomy();
+    }
+  }, [isAuthenticated, initEconomy]);
+
+  // Initialize Socket.io connection and game
+  useEffect(() => {
+    if (isAuthenticated && userProfile && !socket) {
+      try {
+        const { io } = require('socket.io-client');
+        // Use environment variable or fallback to localhost
+        const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
+        const newSocket = io(socketUrl, {
+          transports: ['websocket'],
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionAttempts: 5
+        });
+
+        setSocket(newSocket);
+
+        // Join room when socket connects
+        newSocket.on('connect', () => {
+          console.log('Socket connected');
+          const urlParams = new URLSearchParams(window.location.search);
+          // Use table ID from URL or create a shared room ID based on table
+          const tableParam = urlParams.get('table');
+          // If no table param, use a default room for testing
+          const tableId = tableParam || `default_room_${window.location.pathname}`;
+          
+          const playerData = {
+            id: userProfile.uid,
+            name: userProfile.username,
+            avatarURL: userProfile.avatarURL || '/assets/boy.svg',
+            chips: userProfile.totalChips || 20000
+          };
+          
+          console.log('Joining room:', tableId, 'as player:', playerData.name);
+          joinRoom(tableId, playerData);
+        });
+
+        newSocket.on('connect_error', (error) => {
+          console.warn('Socket connection error (will continue with local game):', error);
+          // Continue with local game if Socket.io server is not available
+        });
+
+        return () => {
+          if (newSocket) {
+            newSocket.disconnect();
+          }
+        };
+      } catch (error) {
+        console.warn('Socket.io not available, continuing with local game:', error);
+      }
+    }
+  }, [isAuthenticated, userProfile, socket, setSocket, joinRoom]);
+
+  // Initialize game when component mounts
+  useEffect(() => {
+    if (!gameInitialized && !players && isAuthenticated && userProfile) {
+      console.log('Initializing game...');
+      const initialChips = userProfile?.totalChips || 20000;
+      const { connectedPlayers, roomId } = useGameStore.getState();
+      
+      // Wait a bit for players to connect
+      const checkPlayers = async () => {
+        // Check password if table is private
+        const urlParams = new URLSearchParams(window.location.search);
+        const tableId = urlParams.get('table');
+        const password = urlParams.get('password');
+        
+        if (tableId) {
+          try {
+            const { doc, getDoc } = await import('firebase/firestore');
+            const { db } = await import('./config/firebase');
+            const tableRef = doc(db, 'tables', tableId);
+            const tableSnap = await getDoc(tableRef);
+            
+            if (tableSnap.exists()) {
+              const tableData = tableSnap.data();
+              // Only check password if table is private and has a password
+              if (tableData.isPrivate && tableData.password) {
+                // If no password provided in URL, redirect to lobby
+                if (!password) {
+                  console.log('Private table requires password, redirecting to lobby');
+                  window.location.href = '/lobby';
+                  return;
+                }
+                // Check if password matches
+                if (password !== tableData.password) {
+                  await showAlert('סיסמה שגויה!', 'error', 'שגיאה');
+                  window.location.href = '/lobby';
+                  return;
+                }
+                console.log('Password verified successfully');
+              }
+            }
+          } catch (error) {
+            console.error('Error checking table password:', error);
+          }
+        }
+        
+        // Wait for at least 2 players
+        let attempts = 0;
+        const maxAttempts = 10; // Wait up to 10 seconds
+        
+        const waitForPlayers = setInterval(async () => {
+          attempts++;
+          const { connectedPlayers: currentPlayers } = useGameStore.getState();
+          
+          // Get players from Firestore room
+          let roomPlayers = [];
+          if (roomId) {
+            try {
+              const { doc, getDoc } = await import('firebase/firestore');
+              const { db } = await import('./config/firebase');
+              const roomRef = doc(db, 'game_rooms', roomId);
+              const roomSnap = await getDoc(roomRef);
+              if (roomSnap.exists()) {
+                roomPlayers = roomSnap.data().players || [];
+              }
+            } catch (error) {
+              console.error('Error loading room players:', error);
+            }
+          }
+          
+          const allPlayers = roomPlayers.length > 0 ? roomPlayers : (currentPlayers || []);
+          
+          if (allPlayers.length >= 2 || attempts >= maxAttempts) {
+            clearInterval(waitForPlayers);
+            
+            // Convert players to game format
+            const existingPlayers = allPlayers.length > 0 
+              ? allPlayers.map(p => ({
+                  id: p.id,
+                  name: p.name,
+                  avatarURL: p.avatarURL || '/assets/boy.svg',
+                  chips: p.chips || 20000,
+                  roundStartChips: p.chips || 20000,
+                  roundEndChips: p.chips || 20000,
+                  currentRoundChipsInvested: 0,
+                  cards: [],
+                  showDownHand: { hand: [], descendingSortHand: [] },
+                  bet: 0,
+                  betReconciled: false,
+                  folded: false,
+                  allIn: false,
+                  canRaise: true,
+                  stackInvestment: 0,
+                  robot: false,
+                  isConnected: true
+                }))
+              : null;
+            
+            initializeGame(initialChips, existingPlayers)
+              .then(() => {
+                console.log('Game initialized successfully');
+                setGameInitialized(true);
+              })
+              .catch((error) => {
+                console.error('Error initializing game:', error);
+                setGameInitialized(true);
+              });
+          }
+        }, 1000);
+      };
+      
+      checkPlayers();
+    }
+  }, [gameInitialized, initializeGame, players, isAuthenticated, userProfile]);
+
+  useEffect(() => {
+    if (phase && phase !== 'loading' && phase !== 'showdown') {
+      setDealerMessage(getPhaseMessage(phase));
+      setIsAnnouncing(true);
+      setTimeout(() => setIsAnnouncing(false), 3000);
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (!loading && activePlayerIndex !== null && players && !players[activePlayerIndex]?.robot && phase !== 'showdown') {
+      startTurnTimer();
+      return () => stopTurnTimer();
+    }
+  }, [activePlayerIndex, phase, loading, players, startTurnTimer, stopTurnTimer]);
+
+  // Update chips after round ends and record house profits
+  useEffect(() => {
+    if (phase === 'showdown' && players && userProfile && isAuthenticated) {
+      const humanPlayer = players.find(p => !p.robot && p.roundEndChips !== undefined);
+      if (humanPlayer && humanPlayer.roundEndChips !== undefined) {
+        // Update chips in Firebase
+        updateChipsAfterRound(userProfile.uid, humanPlayer.roundEndChips);
+      }
+      
+      // Record house rake/profit if available
+      const gameState = useGameStore.getState();
+      if (gameState.roundHouseRake && gameState.roundHouseRake > 0) {
+        recordHouseProfit(gameState.roundHouseRake, pot || 0, `round_${Date.now()}`);
+      }
+    }
+  }, [phase, players, userProfile, isAuthenticated, updateChipsAfterRound, recordHouseProfit, pot]);
+
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+      setShowAuth(true);
+    }
+  }, [isAuthenticated, loading]);
+
+  const getPhaseMessage = (currentPhase) => {
+    switch (currentPhase) {
+      case 'initialDeal':
+        return 'Welcome to the table! Dealing cards...';
+      case 'preflop':
+        return 'Pre-flop betting round begins!';
+      case 'flop':
+        return 'The flop is revealed!';
+      case 'turn':
+        return 'The turn card is revealed!';
+      case 'river':
+        return 'The river card is revealed!';
+      case 'showdown':
+        return 'Showdown! Revealing hands...';
+      default:
+        return '';
+    }
+  };
+
+  const handleDailyBonus = async () => {
+    if (dailyBonusAvailable) {
+      const result = await claimDailyBonus();
+      if (result.success) {
+        setDealerMessage(`Daily bonus claimed! You received ${result.amount} chips!`);
+        setIsAnnouncing(true);
+        setTimeout(() => setIsAnnouncing(false), 3000);
+      }
+    }
+  };
+
+  const renderBoard = () => {
+    if (!players) return null;
+
+    return players.map((player, index) => {
+      const isActive = index === activePlayerIndex;
+      const hasDealerChip = index === dealerIndex;
+
+      return (
+        <Player
+          key={index}
+          arrayIndex={index}
+          isActive={isActive}
+          hasDealerChip={hasDealerChip}
+          player={player}
+          clearCards={clearCards}
+          phase={phase}
+          playerAnimationSwitchboard={playerAnimationSwitchboard}
+          endTransition={popAnimationState}
+        />
+      );
+    });
+  };
+
+  const renderCommunityCards = (purgeAnimation = false) => {
+    return communityCards.map((card, index) => {
+      let cardData = { ...card };
+      if (purgeAnimation) {
+        cardData.animationDelay = 0;
+      }
+      return <Card key={index} cardData={cardData} />;
+    });
+  };
+
+  const renderShowdown = () => {
+    return (
+      <div className="showdown-container--wrapper">
+        <h5 className="showdown-container--title">Round Complete!</h5>
+        <div className="showdown-container--messages">
+          {renderShowdownMessages(showDownMessages)}
+        </div>
+        <h5 className="showdown-container--community-card-label">Community Cards</h5>
+        <div className="showdown-container--community-cards">
+          {renderCommunityCards(true)}
+        </div>
+        <button className="showdown--nextRound--button" onClick={handleNextRound}>
+          Next Round
+        </button>
+        {renderBestHands()}
+      </div>
+    );
+  };
+
+  const renderBestHands = () => {
+    if (!playerHierarchy || playerHierarchy.length === 0) return null;
+
+    return playerHierarchy.map((rankSnapshot, index) => {
+      const tie = Array.isArray(rankSnapshot);
+      return tie ? (
+        <div key={index}>{rankSnapshot.map((player) => renderRankWinner(player))}</div>
+      ) : (
+        renderRankWinner(rankSnapshot)
+      );
+    });
+  };
+
+  const renderRankWinner = (player) => {
+    if (!players) return null;
+    const playerStateData = players.find((p) => p.name === player.name);
+    if (!playerStateData) return null;
+
+    return (
+      <div className="showdown-player--entity" key={player.name}>
+        <ShowdownPlayer
+          name={player.name}
+          avatarURL={playerStateData.avatarURL}
+          cards={playerStateData.cards}
+          roundEndChips={playerStateData.roundEndChips}
+          roundStartChips={playerStateData.roundStartChips}
+        />
+        <div className="showdown-player--besthand--container">
+          <h5 className="showdown-player--besthand--heading">Best Hand</h5>
+          <div className="showdown-player--besthand--cards" style={{ alignItems: 'center' }}>
+            {player.bestHand?.map((card, index) => {
+              const cardData = { ...card, animationDelay: 0 };
+              return <Card key={index} cardData={cardData} />;
+            })}
+          </div>
+        </div>
+        <div className="showdown--handrank">{player.handRank}</div>
+        {renderNetPlayerEarnings(playerStateData.roundEndChips, playerStateData.roundStartChips)}
+      </div>
+    );
+  };
+
+  const renderActionButtons = () => {
+    if (!players || activePlayerIndex === null) return null;
+    const activePlayer = players[activePlayerIndex];
+    if (activePlayer?.robot || phase === 'showdown') return null;
+
+    const min = determineMinBet(highBet, activePlayer.chips, activePlayer.bet);
+    const max = activePlayer.chips + activePlayer.bet;
+
+    return (
+      <>
+        <button
+          className="modern-action-button"
+          onClick={() => handleBetInputSubmit(betInputValue, min, max)}
+        >
+          {renderActionButtonText(highBet, betInputValue, activePlayer)}
+        </button>
+        <button className="modern-action-button fold" onClick={handleFold}>
+          Fold
+        </button>
+      </>
+    );
+  };
+
+  // Debug: Log state to console
+  useEffect(() => {
+    console.log('GameTable State:', {
+      loading,
+      gameInitialized,
+      players: players?.length || 0,
+      activePlayerIndex,
+      phase,
+      winnerFound
+    });
+  }, [loading, gameInitialized, players, activePlayerIndex, phase, winnerFound]);
+
+  // Show loading only if we don't have players yet
+  if (!players || (loading && !gameInitialized)) {
+    return (
+      <>
+        <div 
+          className="modern-poker-background"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            zIndex: -999,
+            pointerEvents: 'none'
+          }}
+        />
+        <div className="poker-table--wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100vh',
+            color: '#FFFFFF',
+            textShadow: '0 0 10px rgba(0, 255, 255, 0.8)',
+            flexDirection: 'column',
+            gap: '20px',
+            position: 'relative',
+            zIndex: 100
+          }}>
+            <Spinner />
+            <div>Loading game...</div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (winnerFound) {
+    return (
+      <>
+        <div 
+          className="modern-poker-background"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            zIndex: -999,
+            pointerEvents: 'none'
+          }}
+        />
+        <div className="poker-table--wrapper" style={{ position: 'relative', zIndex: 1 }}>
+          <WinScreen />
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div 
+        className="modern-poker-background"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundImage: 'url(/assets/poker-table-background.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          zIndex: -999,
+          pointerEvents: 'none'
+        }}
+      />
+      <div className="poker-table--wrapper" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 1 }}>
+      
+      {/* Top Bar with Logo */}
+      <div className="game-top-bar">
+        <div className="game-logo-container">
+          <PokerIsraelLogo size="small" />
+        </div>
+        {(() => {
+          // Find the current player (Player 1) in the game
+          const currentPlayer = players && players.length > 0 
+            ? players.find(p => p.name === 'Player 1' || !p.robot) || players[0]
+            : null;
+          const displayChips = currentPlayer ? currentPlayer.chips : (userProfile?.totalChips || 0);
+          const displayName = currentPlayer ? currentPlayer.name : (userProfile?.username || 'Player');
+          
+          return (
+            <div className="game-user-info">
+              <span className="game-username">{displayName}</span>
+              <span className="game-chips">💰 {displayChips.toLocaleString()}</span>
+            </div>
+          );
+        })()}
+        <button 
+          className="game-back-btn" 
+          onClick={() => window.location.href = '/'}
+        >
+          ← Back to Lobby
+        </button>
+      </div>
+      
+      <div className="modern-table-container" style={{ position: 'relative', zIndex: 10, paddingTop: '10px', paddingBottom: '150px' }}>
+        <div className="poker-table--container" style={{ position: 'relative', zIndex: 10, margin: '0 auto' }}>
+          <img
+            className="poker-table--table-image"
+            src="/assets/table-nobg-svg-01.svg"
+            alt="Poker Table"
+            onError={(e) => {
+              console.error('Failed to load table image');
+              e.target.style.display = 'none';
+            }}
+          />
+          
+          <Dealer 
+            phase={phase} 
+            message={dealerMessage} 
+            isAnnouncing={isAnnouncing}
+            showTipButton={players && players.find(p => !p.robot)}
+            onTipDealer={async () => {
+              const tipAmount = 100;
+              const result = await tipDealer(tipAmount);
+              if (result.success) {
+                setDealerMessage(`Thank you for the ${tipAmount} chip tip! 🎰`);
+                setIsAnnouncing(true);
+                setTimeout(() => setIsAnnouncing(false), 3000);
+              }
+            }}
+          />
+          
+          {players && players.length > 0 ? renderBoard() : (
+            <div style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              color: '#FFFFFF',
+            textShadow: '0 0 10px rgba(0, 255, 255, 0.8)',
+              textAlign: 'center',
+              zIndex: 100
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '10px' }}>Loading players...</div>
+            </div>
+          )}
+          
+          <div className="community-card-container modern-community-cards">
+            {communityCards && communityCards.length > 0 ? renderCommunityCards() : null}
+          </div>
+          
+          <div className="pot-container modern-pot-container">
+            <img
+              className="modern-pot-icon"
+              style={{ height: 55, width: 55 }}
+              src="/assets/pot.svg"
+              alt="Pot Value"
+              onError={(e) => {
+                console.error('Failed to load pot icon');
+                e.target.style.display = 'none';
+              }}
+            />
+            <h4 className="modern-pot-value">{pot || 0}</h4>
+          </div>
+        </div>
+      </div>
+
+      {phase === 'showdown' && renderShowdown()}
+
+      {timerActive && (
+        <div className={`modern-timer ${turnTimeRemaining <= 10 ? 'warning' : ''}`}>
+          <div className="modern-timer-label">Time Remaining</div>
+          <div className="modern-timer-value">{turnTimeRemaining}s</div>
+        </div>
+      )}
+
+      <div className="modern-action-bar">
+        <div className="action-buttons">{renderActionButtons()}</div>
+        <div className="slider-boi">
+          {!loading &&
+            renderActionMenu(
+              highBet,
+              players,
+              activePlayerIndex,
+              phase,
+              handleBetInputChange,
+              changeSliderInput
+            )}
+        </div>
+      </div>
+
+      {dailyBonusAvailable && (
+        <button
+          className="modern-action-button"
+          onClick={handleDailyBonus}
+          style={{ position: 'fixed', top: '80px', left: '20px', zIndex: 1001 }}
+        >
+          Claim Daily Bonus
+        </button>
+      )}
+
+      <button
+        className="modern-action-button"
+        onClick={() => setShowBonusWheel(true)}
+        style={{ position: 'fixed', top: '80px', left: '200px', zIndex: 1001 }}
+      >
+        Bonus Wheel
+      </button>
+
+      <Chat socket={socket} roomId={roomId} isOpen={showChat} onToggle={() => setShowChat(!showChat)} />
+
+      <BonusWheel isOpen={showBonusWheel} onClose={() => setShowBonusWheel(false)} />
+
+      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
+      </div>
+    </>
+  );
+}
+
+// Lobby wrapper component with navigation
+function LobbyWrapper() {
+  return <Lobby onJoinTable={() => {}} onCreateTable={() => {}} />;
+}
+
+function App() {
+  const { isAuthenticated, loading: authLoading, initAuth } = useAuthStore();
+  const { initializeGame } = useGameStore();
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  if (authLoading) {
+    return (
+      <>
+        <div 
+          className="modern-poker-background"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            zIndex: -999,
+            pointerEvents: 'none'
+          }}
+        />
+        <div className="poker-table--wrapper" style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div className="modern-spinner" />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route 
+            path="/lobby" 
+            element={
+              <ProtectedRoute>
+                <LobbyWrapper />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
+            path="/game"
+            element={
+              <ProtectedRoute>
+                <GameTable />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </ErrorBoundary>
+  );
+}
+
+// Protected Route Component - redirects to login if not authenticated
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuthStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, loading, navigate]);
+
+  if (loading) {
+    return (
+      <>
+        <div 
+          className="modern-poker-background"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            zIndex: -999,
+            pointerEvents: 'none'
+          }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', position: 'relative', zIndex: 1 }}>
+          <div className="modern-spinner" />
+        </div>
+      </>
+    );
+  }
+
+  return isAuthenticated ? children : null;
+}
+
+export default App;

@@ -1,0 +1,88 @@
+/**
+ * Poker Israel Logo Styles
+ * Uses the official POKER ISRAEL logo image
+ */
+.poker-israel-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.poker-israel-logo-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  transition: all 0.3s ease;
+}
+
+.poker-israel-logo:hover .poker-israel-logo-image {
+  transform: scale(1.05);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7));
+}
+
+/* Size variations */
+.logo-large .poker-israel-logo-image {
+  width: 200px;
+}
+
+.logo-medium .poker-israel-logo-image {
+  width: 150px;
+}
+
+.logo-small .poker-israel-logo-image {
+  width: 100px;
+}
+
+/* Animation */
+.poker-israel-logo {
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Glow effect on hover */
+.poker-israel-logo::before {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(26, 58, 143, 0.2) 0%, transparent 70%);
+  animation: logoGlow 2s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes logoGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-large .poker-israel-logo-image {
+    width: 150px;
+  }
+  
+  .logo-medium .poker-israel-logo-image {
+    width: 120px;
+  }
+  
+  .logo-small .poker-israel-logo-image {
+    width: 80px;
+  }
+}
+

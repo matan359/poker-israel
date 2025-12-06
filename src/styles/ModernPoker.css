@@ -1,0 +1,619 @@
+/**
+ * Modern Futuristic Casino Poker Styles
+ * Poker Israel - Blue & White Neon Theme
+ */
+
+:root {
+  /* Poker Israel - Blue & White Neon Theme */
+  --primary-blue: #0066FF;
+  --bright-blue: #00BFFF;
+  --neon-blue: #00FFFF;
+  --dark-blue: #003366;
+  --darker-blue: #001122;
+  --white: #FFFFFF;
+  --off-white: #F0F8FF;
+  --neon-white: rgba(255, 255, 255, 0.95);
+  --blue-glow: rgba(0, 102, 255, 0.8);
+  --cyan-glow: rgba(0, 255, 255, 0.9);
+  --white-glow: rgba(255, 255, 255, 0.6);
+  --card-glow: rgba(0, 191, 255, 0.3);
+  --neon-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(0, 102, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: transparent;
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* Modern Poker Table Background */
+.modern-poker-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -1;
+  min-height: 100vh;
+  /* Background image is set via inline style in App.jsx */
+}
+
+.modern-poker-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 17, 34, 0.3); /* Dark blue overlay */
+  z-index: 0;
+}
+
+.modern-poker-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+  animation: backgroundPulse 10s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Modern Card Styles */
+.modern-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
+  border: 2px solid var(--neon-blue);
+  box-shadow: var(--neon-shadow);
+  border-radius: 12px;
+  height: 80px;
+  width: 56px;
+  margin: 0 3px;
+  box-shadow: 
+    0 0 20px var(--card-glow),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: cardShine 3s infinite;
+}
+
+@keyframes cardShine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.modern-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 
+    0 0 30px var(--cyan-glow),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.modern-card.red {
+  color: #d32f2f;
+}
+
+.modern-card.black {
+  color: #1a1a1a;
+}
+
+.modern-card-value {
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.modern-card-suit {
+  font-size: 24px;
+  margin-top: 2px;
+}
+
+/* Modern Player Styles */
+.modern-player {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.modern-player.active {
+  filter: drop-shadow(0 0 20px var(--cyan-glow));
+}
+
+.modern-player-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+  box-shadow: 
+    0 0 20px var(--blue-glow),
+    inset 0 0 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-player.active .modern-player-avatar {
+  border-color: var(--neon-blue);
+  box-shadow: 
+    0 0 30px var(--cyan-glow),
+    inset 0 0 20px rgba(0, 191, 255, 0.3);
+  animation: playerPulse 2s ease-in-out infinite;
+}
+
+@keyframes playerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.modern-player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.modern-player-info {
+  margin-top: 10px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.8) 0%, rgba(0, 51, 102, 0.9) 100%);
+  border: 2px solid var(--primary-blue);
+  border-radius: 15px;
+  padding: 10px 15px;
+  min-width: 120px;
+  box-shadow: 0 0 15px var(--blue-glow);
+}
+
+.modern-player.active .modern-player-info {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.modern-player-name {
+  color: var(--neon-white);
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-shadow: 0 0 10px var(--cyan-glow);
+}
+
+.modern-player-chips {
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.modern-player-bet {
+  color: var(--neon-white);
+  font-size: 14px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Modern Pot Display */
+.modern-pot-container {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.modern-pot-icon {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0 0 20px var(--cyan-glow));
+  animation: potGlow 2s ease-in-out infinite;
+}
+
+@keyframes potGlow {
+  0%, 100% { filter: drop-shadow(0 0 20px var(--cyan-glow)); }
+  50% { filter: drop-shadow(0 0 30px var(--cyan-glow)); }
+}
+
+.modern-pot-value {
+  color: var(--neon-white);
+  font-size: 32px;
+  font-weight: bold;
+  text-shadow: 
+    0 0 20px var(--cyan-glow),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-top: 10px;
+}
+
+/* Modern Action Buttons */
+.modern-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(26, 0, 0, 0.9) 100%);
+  border-top: 3px solid var(--primary-blue);
+  box-shadow: 0 -5px 30px var(--blue-glow);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  z-index: 1000;
+  box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
+  height: auto;
+  min-height: 80px;
+  max-height: 120px;
+  backdrop-filter: blur(10px);
+}
+
+.modern-action-button {
+  padding: 15px 30px;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+  border: 2px solid var(--neon-blue);
+  box-shadow: var(--neon-shadow);
+  border-radius: 25px;
+  color: var(--neon-white);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 20px var(--blue-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-action-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.modern-action-button:hover::before {
+  left: 100%;
+}
+
+.modern-action-button:hover {
+  background: linear-gradient(135deg, var(--bright-blue) 0%, var(--primary-blue) 100%);
+  box-shadow: 0 0 30px var(--cyan-glow);
+  transform: translateY(-2px);
+}
+
+.modern-action-button:active {
+  transform: translateY(0);
+}
+
+.modern-action-button.fold {
+  background: linear-gradient(135deg, #001122 0%, #000811 100%);
+}
+
+.modern-action-button.fold:hover {
+  background: linear-gradient(135deg, #003366 0%, #001122 100%);
+}
+
+/* Modern Timer */
+.modern-timer {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
+  border: 2px solid var(--primary-blue);
+  border-radius: 15px;
+  padding: 15px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0 20px var(--blue-glow);
+  z-index: 1001;
+  backdrop-filter: blur(10px);
+}
+
+.modern-timer-label {
+  color: #ccc;
+  font-size: 12px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modern-timer-value {
+  color: var(--neon-white);
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 0 10px var(--cyan-glow);
+}
+
+.modern-timer.warning .modern-timer-value {
+  color: var(--neon-blue);
+  text-shadow: 0 0 15px var(--cyan-glow);
+  animation: timerPulse 1s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Game Top Bar */
+.game-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.95) 0%, rgba(0, 51, 102, 0.95) 50%, rgba(0, 17, 34, 0.95) 100%);
+  box-shadow: 0 4px 20px var(--blue-glow);
+  border-bottom: 3px solid var(--primary-blue);
+  box-shadow: 0 4px 20px var(--blue-glow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+  .game-top-bar {
+    height: auto;
+    min-height: 60px;
+    flex-direction: column;
+    padding: 10px 15px;
+    gap: 10px;
+  }
+  
+  .game-logo-container {
+    order: -1;
+  }
+  
+  .game-user-info {
+    font-size: 12px;
+  }
+  
+  .game-back-btn {
+    padding: 8px 15px;
+    font-size: 12px;
+  }
+}
+
+.game-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.game-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.game-username {
+  color: var(--neon-white);
+  text-shadow: 0 0 10px var(--cyan-glow);
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.game-chips {
+  color: #fff;
+  font-size: 14px;
+}
+
+.game-back-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
+  border: 2px solid #00FFFF;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+  border-radius: 8px;
+  color: var(--neon-white);
+  text-shadow: 0 0 10px var(--cyan-glow);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.game-back-btn:hover {
+  background: linear-gradient(135deg, var(--bright-blue) 0%, var(--primary-blue) 100%);
+  box-shadow: 0 0 20px var(--cyan-glow);
+  transform: translateY(-2px);
+}
+
+/* Modern Table */
+.modern-table-container {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  margin-top: 70px;
+  padding-bottom: 150px; /* Space for action bar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.modern-table-image {
+  width: 100%;
+  max-width: 1200px;
+  height: auto;
+  filter: drop-shadow(0 0 50px rgba(0, 102, 255, 0.6));
+  position: relative;
+  z-index: 1;
+}
+
+/* Community Cards */
+.modern-community-cards {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 10px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-player-avatar {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .modern-player-info {
+    min-width: 100px;
+    padding: 8px 12px;
+  }
+  
+  .modern-player-name {
+    font-size: 12px;
+  }
+  
+  .modern-player-chips {
+    font-size: 14px;
+  }
+  
+  .modern-action-bar {
+    flex-direction: column;
+    padding: 15px 10px;
+    gap: 10px;
+  }
+  
+  .modern-action-button {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+  
+  .modern-pot-value {
+    font-size: 20px;
+  }
+  
+  .modern-pot-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .modern-timer {
+    top: 80px;
+    right: 10px;
+    padding: 10px 15px;
+  }
+  
+  .modern-timer-value {
+    font-size: 18px;
+  }
+  
+  .modern-community-cards {
+    gap: 5px;
+  }
+  
+  .modern-card {
+    width: 45px;
+    height: 65px;
+    font-size: 12px;
+  }
+}
+
+/* Loading Spinner */
+.modern-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(0, 102, 255, 0.4);
+  border-top-color: var(--neon-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Notification Styles */
+.modern-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(26, 0, 0, 0.95) 100%);
+  border: 2px solid var(--neon-blue);
+  box-shadow: var(--neon-shadow);
+  border-radius: 10px;
+  padding: 15px 25px;
+  color: var(--neon-white);
+  font-weight: bold;
+  box-shadow: 0 0 30px var(--gold-glow);
+  z-index: 1000;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+

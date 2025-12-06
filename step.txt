@@ -1,0 +1,63 @@
+
+
+I want you to upgrade the project into a much more advanced, modern, and stylish online Texas Hold’em platform.
+
+Here are the full requirements:
+
+1. **New UI/UX Design**
+   - Redesign the entire interface in a dark, red-themed futuristic casino style similar to the reference image provided.
+   - Add dramatic lighting, glow effects, polished 3D-style poker chips/cards.
+   - Improve layout positioning: table, players, cards, pot, actions, timers.
+   - Make everything more ergonomic, centered, and clear.
+   - Add animations for dealing cards, winning hands, chip movements, etc.
+
+2. **Dealer / Dealer Girl**
+   - Add a virtual animated dealer standing behind the table.
+   - Dealer introduces the round, deals cards, announces winner.
+   - Can be static, animated, or reactive based on events.
+
+3. **User System**
+   - Add authentication (email/password or social login).
+   - Player profile with:
+     - username
+     - avatar
+     - level
+     - achievements
+     - total chips
+     - history of games
+
+4. **Economy System**
+   - Add bonuses:
+     - daily login bonus
+     - hourly spin bonus wheel
+     - winning streak rewards
+   - Add an in-game store:
+     - purchase chips with money
+     - purchase cosmetics (avatars, card backs, table skins)
+   - Add transaction logs.
+
+5. **Multiplayer Upgrade**
+   - Convert the game to real-time multiplayer using WebSockets (Socket.io or similar).
+   - Players join tables dynamically.
+   - Add lobby screen with available tables.
+
+6. **Improved Gameplay**
+   - Add player chat
+   - Timers for each turn
+   - Auto-fold if time expires
+   - Spectator mode
+   - Sound effects and background music
+
+7. **Code Changes**
+   - Refactor project into clean components
+   - Add global game state with Redux / Zustand
+   - Modularize the table logic
+   - Add scalable theme system for future skins
+   - Improve responsiveness for mobile
+
+Deliver:
+- Updated code structure
+- Fully redesigned UI
+- All new features implemented
+- Comments inside code
+- Suggestions for further improvements

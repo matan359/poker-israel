@@ -1,0 +1,146 @@
+/**
+ * Create Private Table Modal Styles
+ */
+.create-table-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.create-table-modal {
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.95) 0%, rgba(0, 51, 102, 0.95) 100%);
+  border: 3px solid #00FFFF;
+  border-radius: 25px;
+  padding: 40px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+  position: relative;
+}
+
+.create-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.create-table-header h2 {
+  color: #FFFFFF;
+  font-size: 28px;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.9);
+  direction: rtl;
+}
+
+.create-table-close {
+  background: transparent;
+  border: 2px solid #00FFFF;
+  color: #FFFFFF;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.create-table-close:hover {
+  background: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+.create-table-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  direction: rtl;
+}
+
+.form-group input {
+  padding: 15px;
+  background: rgba(0, 17, 34, 0.8);
+  border: 2px solid #0066FF;
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  direction: rtl;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #00FFFF;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.error-message {
+  background: rgba(255, 0, 0, 0.2);
+  border: 2px solid #ff4444;
+  border-radius: 10px;
+  padding: 12px;
+  color: #ffcccc;
+  text-align: center;
+  font-size: 14px;
+  direction: rtl;
+}
+
+.create-table-submit {
+  padding: 18px;
+  background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
+  border: 3px solid #00FFFF;
+  border-radius: 15px;
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
+  direction: rtl;
+}
+
+.create-table-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00BFFF 0%, #0066FF 100%);
+  box-shadow: 0 0 35px rgba(0, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
+.create-table-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
