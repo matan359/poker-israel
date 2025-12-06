@@ -675,7 +675,7 @@ const useGameStore = create((set, get) => ({
             let hasNewPlayers = false;
             
             updatedPlayers.forEach(roomPlayer => {
-              const existingIndex = updatedPlayers.findIndex(p => p.id === roomPlayer.id);
+              const existingIndex = mergedPlayers.findIndex(p => p.id === roomPlayer.id);
               if (existingIndex !== -1) {
                 // Update existing player
                 mergedPlayers[existingIndex] = {
