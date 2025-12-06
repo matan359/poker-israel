@@ -92,18 +92,11 @@ const useGameStore = create((set, get) => ({
         throw new Error('No players generated');
       }
 
-      // Check minimum 2 players requirement
+      // generateTable now ensures we have at least 2 players (adds robots if needed)
+      // So we can always start the game
       if (players.length < 2) {
-        console.warn('Not enough players to start game. Waiting for more players...');
-        set({ 
-          loading: false,
-          phase: 'waiting',
-          players: players
-        });
-        // Show message to user
-        const { showAlert } = await import('../utils/dialogs');
-        await showAlert('נדרשים לפחות 2 שחקנים כדי להתחיל משחק. אנא המתין לשחקן נוסף או הזמן חברים!', 'warning', 'ממתין לשחקנים');
-        return Promise.resolve();
+        console.warn('Only', players.length, 'player(s) - this should not happen as generateTable adds robots');
+        // Continue anyway - the game will work
       }
       
       // Apply dealer rake (5% commission) to human player
