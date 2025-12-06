@@ -639,13 +639,31 @@ body {
   }
   
   .modern-community-cards {
-    gap: 5px;
+    gap: 6px;
+    top: 30% !important;
   }
   
   .modern-card {
-    width: 45px;
-    height: 65px;
-    font-size: 12px;
+    width: 48px;
+    height: 68px;
+    font-size: 13px;
+  }
+  
+  .modern-action-bar {
+    padding: 12px 10px;
+    gap: 8px;
+    min-height: 70px;
+  }
+  
+  .modern-action-button {
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  
+  .modern-table-container {
+    padding-top: 5px;
+    padding-bottom: 120px;
   }
 }
 
