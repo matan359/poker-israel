@@ -73,6 +73,7 @@ function GameTable() {
     stopTurnTimer,
     setSocket,
     joinRoom,
+    leaveRoom,
   } = useGameStore();
 
   const { isAuthenticated, userProfile, initAuth, updateChipsAfterRound } = useAuthStore();
@@ -366,6 +367,26 @@ function GameTable() {
   }, [activePlayerIndex, phase, loading, players, startTurnTimer, stopTurnTimer]);
 
   // Update chips after round ends and record house profits
+  // Cleanup: Leave room when component unmounts or user navigates away
+  useEffect(() => {
+    // Handle page unload
+    const handleBeforeUnload = () => {
+      if (roomId) {
+        leaveRoom();
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (roomId) {
+        leaveRoom();
+      }
+    };
+  }, [roomId, leaveRoom]);
+
   useEffect(() => {
     if (phase === 'showdown' && players && userProfile && isAuthenticated) {
       const humanPlayer = players.find(p => !p.robot && p.roundEndChips !== undefined);

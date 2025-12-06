@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { showAlert, showConfirm } from '../../utils/dialogs';
+import { showAlert, showConfirm, showPrompt } from '../../utils/dialogs';
 import './Admin.css';
 
 const Admin = ({ isOpen, onClose }) => {
@@ -268,6 +268,109 @@ const Admin = ({ isOpen, onClose }) => {
                 <input type="number" defaultValue="20000" min="1000" />
               </div>
               <button>שמור הגדרות</button>
+              
+              <div className="admin-users-section" style={{ marginTop: '30px', paddingTop: '30px', borderTop: '2px solid #333' }}>
+                <h3>ניהול משתמשים</h3>
+                <div className="admin-setting-item">
+                  <label>הפוך משתמש לאדמין (לפי אימייל)</label>
+                  <button 
+                    onClick={async () => {
+                      const email = await showPrompt('הזן אימייל של המשתמש להפוך לאדמין:', 'הפוך לאדמין', 'matanyou7@gmail.com', 'email');
+                      if (!email) return;
+                      
+                      try {
+                        setLoading(true);
+                        // Find user by email
+                        const usersRef = collection(db, 'users');
+                        const q = query(usersRef, where('email', '==', email));
+                        const snapshot = await getDocsQuery(q);
+                        
+                        if (snapshot.empty) {
+                          // Try to find by uid if email not found
+                          const allUsers = await getDocs(usersRef);
+                          const userDoc = Array.from(allUsers.docs).find(doc => {
+                            const data = doc.data();
+                            return data.email === email || doc.id === email;
+                          });
+                          
+                          if (userDoc) {
+                            await updateDoc(doc(db, 'users', userDoc.id), {
+                              isAdmin: true,
+                              email: email
+                            });
+                            await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                          } else {
+                            await showAlert(`משתמש עם אימייל ${email} לא נמצא`, 'error', 'שגיאה');
+                          }
+                        } else {
+                          // Update first matching user
+                          const userDoc = snapshot.docs[0];
+                          await updateDoc(doc(db, 'users', userDoc.id), {
+                            isAdmin: true
+                          });
+                          await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                        }
+                      } catch (error) {
+                        console.error('Error making user admin:', error);
+                        await showAlert(`שגיאה בהפיכת משתמש לאדמין: ${error.message}`, 'error', 'שגיאה');
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                  >
+                    הפוך לאדמין
+                  </button>
+                </div>
+                <div className="admin-setting-item" style={{ marginTop: '10px' }}>
+                  <button 
+                    onClick={async () => {
+                      // Quick action: Make matanyou7@gmail.com admin
+                      try {
+                        setLoading(true);
+                        const email = 'matanyou7@gmail.com';
+                        const usersRef = collection(db, 'users');
+                        const q = query(usersRef, where('email', '==', email));
+                        const snapshot = await getDocsQuery(q);
+                        
+                        if (snapshot.empty) {
+                          // Try to find by searching all users
+                          const allUsers = await getDocs(usersRef);
+                          const userDoc = Array.from(allUsers.docs).find(doc => {
+                            const data = doc.data();
+                            return data.email === email;
+                          });
+                          
+                          if (userDoc) {
+                            await updateDoc(doc(db, 'users', userDoc.id), {
+                              isAdmin: true,
+                              email: email
+                            });
+                            await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                          } else {
+                            await showAlert(`משתמש ${email} לא נמצא. ודא שהמשתמש נרשם קודם.`, 'warning', 'אזהרה');
+                          }
+                        } else {
+                          const userDoc = snapshot.docs[0];
+                          await updateDoc(doc(db, 'users', userDoc.id), {
+                            isAdmin: true
+                          });
+                          await showAlert(`משתמש ${email} הופך לאדמין בהצלחה!`, 'success', 'הצלחה!');
+                        }
+                      } catch (error) {
+                        console.error('Error making user admin:', error);
+                        await showAlert(`שגיאה: ${error.message}`, 'error', 'שגיאה');
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    style={{ backgroundColor: '#4CAF50', color: 'white' }}
+                  >
+                    הפוך את matanyou7@gmail.com לאדמין
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

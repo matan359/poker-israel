@@ -781,8 +781,39 @@ const useGameStore = create((set, get) => ({
     await get().setupFirestoreSync(roomId, playerData);
   },
 
-  leaveRoom: () => {
-    const { firestoreUnsubscribe, socket } = get();
+  leaveRoom: async () => {
+    const { firestoreUnsubscribe, socket, roomId, players } = get();
+    
+    // Remove player from Firestore room
+    if (roomId) {
+      try {
+        const { doc, getDoc, updateDoc, arrayRemove } = await import('firebase/firestore');
+        const { db } = await import('../config/firebase');
+        const roomRef = doc(db, 'game_rooms', roomId);
+        const roomSnap = await getDoc(roomRef);
+        
+        if (roomSnap.exists()) {
+          const roomData = roomSnap.data();
+          const currentPlayers = roomData.players || [];
+          
+          // Find current user's player data
+          const { userProfile } = await import('./authStore').then(m => m.default.getState());
+          if (userProfile) {
+            // Remove player from room
+            const playerToRemove = currentPlayers.find(p => p.id === userProfile.uid);
+            if (playerToRemove) {
+              await updateDoc(roomRef, {
+                players: arrayRemove(playerToRemove),
+                lastUpdate: new Date().toISOString()
+              });
+              console.log('✅ Removed player from room:', userProfile.uid);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error removing player from room:', error);
+      }
+    }
     
     // Unsubscribe from Firestore
     if (firestoreUnsubscribe) {
@@ -791,7 +822,7 @@ const useGameStore = create((set, get) => ({
     
     // Leave Socket.io room
     if (socket && socket.connected) {
-      socket.emit('leaveRoom', { roomId: get().roomId });
+      socket.emit('leaveRoom', { roomId });
     }
     
     set({ 
