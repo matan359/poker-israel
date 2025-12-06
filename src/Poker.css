@@ -316,15 +316,22 @@ img {
  	position: absolute;
  	display: flex;
  	justify-content: center;
+ 	align-items: center;
+ 	flex-wrap: nowrap;
 
  	top: calc(39.5% - 60px);
- 	left: calc(50% - 100px);
+ 	left: 50%;
+ 	transform: translateX(-50%);
  	
- 	display: flex;
+ 	width: auto;
+ 	min-width: fit-content;
+ 	height: 120px;
+ 	gap: 12px;
+ }
 
- 	width: 200px;
- 	height: 60px;
-
+ .community-card-container .playing-card {
+ 	flex-shrink: 0;
+ 	margin: 0;
  }
 
  .showdown-container--community-cards {
