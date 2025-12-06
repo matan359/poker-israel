@@ -220,28 +220,45 @@
 
 @media (max-width: 768px) {
   .custom-prompt {
-    min-width: 90%;
-    max-width: 90%;
-    margin: 20px;
+    min-width: 85%;
+    max-width: 85%;
+    margin: 15px;
+    padding: 15px;
+  }
+  
+  .custom-prompt-header {
+    padding: 15px 20px;
   }
   
   .custom-prompt-title {
-    font-size: 24px;
+    font-size: 18px;
+  }
+  
+  .custom-prompt-body {
+    padding: 20px;
   }
   
   .custom-prompt-message {
-    font-size: 16px;
+    font-size: 14px;
   }
   
   .custom-prompt-input {
-    font-size: 16px;
-    padding: 12px 18px;
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+  
+  .custom-prompt-footer {
+    padding: 15px 20px 20px;
   }
   
   .custom-prompt-btn {
-    padding: 12px 25px;
-    font-size: 16px;
-    min-width: 110px;
+    padding: 10px 18px;
+    font-size: 13px;
+    min-width: 100px;
+  }
+  
+  .custom-prompt-icon {
+    font-size: 24px;
   }
 }
 

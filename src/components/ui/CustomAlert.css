@@ -193,22 +193,40 @@
 
 @media (max-width: 768px) {
   .custom-alert {
-    min-width: 90%;
-    max-width: 90%;
-    margin: 20px;
+    min-width: 85%;
+    max-width: 85%;
+    margin: 15px;
+    padding: 15px;
+  }
+  
+  .custom-alert-header {
+    padding: 15px 20px;
   }
   
   .custom-alert-title {
-    font-size: 24px;
+    font-size: 18px;
+  }
+  
+  .custom-alert-body {
+    padding: 20px;
   }
   
   .custom-alert-message {
-    font-size: 16px;
+    font-size: 14px;
+  }
+  
+  .custom-alert-footer {
+    padding: 15px 20px 20px;
   }
   
   .custom-alert-btn {
-    padding: 12px 30px;
-    font-size: 16px;
+    padding: 10px 20px;
+    font-size: 13px;
+    min-width: 120px;
+  }
+  
+  .custom-alert-icon {
+    font-size: 24px;
   }
 }
 
