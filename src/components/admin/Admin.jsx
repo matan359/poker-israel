@@ -371,6 +371,63 @@ const Admin = ({ isOpen, onClose }) => {
                   </button>
                 </div>
               </div>
+              
+              <div className="admin-maintenance-section" style={{ marginTop: '30px', paddingTop: '30px', borderTop: '2px solid #333' }}>
+                <h3>תחזוקה</h3>
+                <div className="admin-setting-item">
+                  <label>ניקוי שולחנות</label>
+                  <button 
+                    onClick={async () => {
+                      const confirmed = await showConfirm(
+                        'האם אתה בטוח שברצונך לנתק את כל השחקנים מכל השולחנות?\nפעולה זו תסיר את כל השחקנים מכל השולחנות הפעילים.',
+                        'ניקוי שולחנות',
+                        'נתק את כל השחקנים',
+                        'ביטול'
+                      );
+                      if (!confirmed) return;
+                      
+                      try {
+                        setLoading(true);
+                        const roomsRef = collection(db, 'game_rooms');
+                        const roomsSnapshot = await getDocs(roomsRef);
+                        
+                        let cleanedCount = 0;
+                        const updatePromises = [];
+                        
+                        roomsSnapshot.docs.forEach(roomDoc => {
+                          const roomData = roomDoc.data();
+                          if (roomData.players && roomData.players.length > 0) {
+                            updatePromises.push(
+                              updateDoc(doc(db, 'game_rooms', roomDoc.id), {
+                                players: [],
+                                lastUpdate: new Date().toISOString(),
+                                status: 'waiting'
+                              })
+                            );
+                            cleanedCount++;
+                          }
+                        });
+                        
+                        await Promise.all(updatePromises);
+                        await showAlert(
+                          `ניקוי הושלם בהצלחה!\n${cleanedCount} שולחנות נוקו\nכל השחקנים נותקו מהשולחנות.`,
+                          'success',
+                          'הצלחה!'
+                        );
+                      } catch (error) {
+                        console.error('Error cleaning tables:', error);
+                        await showAlert(`שגיאה בניקוי שולחנות: ${error.message}`, 'error', 'שגיאה');
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    style={{ backgroundColor: '#ff4444', color: 'white', marginTop: '10px' }}
+                  >
+                    נתק את כל השחקנים מכל השולחנות
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
