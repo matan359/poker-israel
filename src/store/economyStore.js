@@ -245,16 +245,35 @@ const useEconomyStore = create((set, get) => ({
   tipDealer: async (amount) => {
     try {
       const { user, userProfile, updateProfile } = useAuthStore.getState();
-      if (!user || !userProfile) return { success: false, error: 'Not authenticated' };
+      if (!user || !userProfile) {
+        console.error('Tip dealer: Not authenticated');
+        return { success: false, error: 'Not authenticated' };
+      }
 
-      if (userProfile.totalChips < amount) {
+      const currentChips = userProfile.totalChips || 0;
+      console.log('Tip dealer: Current chips:', currentChips, 'Amount:', amount);
+
+      if (currentChips < amount) {
+        console.warn('Tip dealer: Insufficient chips');
         return { success: false, error: 'Insufficient chips' };
       }
 
-      // Deduct chips from player
-      await updateProfile({
-        totalChips: userProfile.totalChips - amount,
+      const newChips = currentChips - amount;
+      console.log('Tip dealer: Deducting', amount, 'chips. New total:', newChips);
+
+      // Deduct chips from player - CRITICAL: This must update Firestore
+      const updateResult = await updateProfile({
+        totalChips: newChips,
       });
+
+      if (!updateResult || !updateResult.success) {
+        console.error('Tip dealer: Failed to update profile');
+        return { success: false, error: 'Failed to update chips' };
+      }
+
+      // Verify the update worked by reloading profile
+      const updatedProfile = useAuthStore.getState().userProfile;
+      console.log('Tip dealer: Updated chips in store:', updatedProfile?.totalChips);
 
       // Record tip in transactions
       await addDoc(collection(db, 'transactions'), {
@@ -271,11 +290,12 @@ const useEconomyStore = create((set, get) => ({
         amount: amount,
         userId: user.uid,
         timestamp: new Date().toISOString(),
-        description: `Dealer tip from ${userProfile.username}`,
+        description: `Dealer tip from ${userProfile.username || user.email}`,
       });
 
       await get().loadTransactions();
-      return { success: true, amount };
+      console.log('Tip dealer: Success! Chips deducted:', amount);
+      return { success: true, amount, newChips };
     } catch (error) {
       console.error('Error tipping dealer:', error);
       return { success: false, error: error.message };

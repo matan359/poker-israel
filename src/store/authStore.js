@@ -194,14 +194,23 @@ const useAuthStore = create((set, get) => ({
   // Update user profile
   updateProfile: async (updates) => {
     try {
-      const { user } = get();
+      const { user, userProfile } = get();
       if (!user) return { success: false, error: 'Not authenticated' };
 
+      console.log('Update profile: Updating', Object.keys(updates), 'for user', user.uid);
+      console.log('Update profile: Current chips:', userProfile?.totalChips, 'New chips:', updates.totalChips);
+
+      // Update Firestore
       await updateDoc(doc(db, 'users', user.uid), updates);
+      
+      // Reload profile from Firestore to ensure we have the latest data
       const updatedProfile = await get().loadUserProfile(user.uid);
       
+      // Update state immediately
       set({ userProfile: updatedProfile });
-      return { success: true };
+      
+      console.log('Update profile: Success! New chips in profile:', updatedProfile?.totalChips);
+      return { success: true, profile: updatedProfile };
     } catch (error) {
       console.error('Update profile error:', error);
       return { success: false, error: error.message };
