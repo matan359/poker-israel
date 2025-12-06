@@ -127,8 +127,62 @@ const Player = (props) => {
           { renderDealerChip() }
         </div>
       </div>
+      {/* Hand Strength Indicator - only for current user */}
+      {isCurrentUser && !folded && cards && cards.length >= 2 && (
+        <HandStrengthIndicator 
+          playerCards={cards} 
+          communityCards={communityCards}
+        />
+      )}
     </div>
   )
 }
+
+// Hand Strength Indicator Component
+const HandStrengthIndicator = ({ playerCards, communityCards }) => {
+  const strength = calculateHandStrength(playerCards, communityCards);
+  
+  const getColor = () => {
+    switch(strength) {
+      case 'strong':
+        return '#d32f2f'; // Red
+      case 'medium':
+        return '#ff9800'; // Orange
+      case 'weak':
+        return '#4caf50'; // Green
+      default:
+        return '#9e9e9e'; // Gray
+    }
+  };
+  
+  const getWidth = () => {
+    switch(strength) {
+      case 'strong':
+        return '100%'; // Full bar for strong hands
+      case 'medium':
+        return '60%'; // Medium bar
+      case 'weak':
+        return '30%'; // Small bar for weak hands
+      default:
+        return '10%';
+    }
+  };
+  
+  return (
+    <div className="hand-strength-indicator">
+      <div 
+        className="hand-strength-bar"
+        style={{
+          width: getWidth(),
+          backgroundColor: getColor(),
+          height: '6px',
+          borderRadius: '3px',
+          transition: 'all 0.3s ease',
+          boxShadow: `0 0 10px ${getColor()}80`
+        }}
+      />
+    </div>
+  );
+};
 
 export default Player;
