@@ -914,31 +914,38 @@ const useGameStore = create((set, get) => ({
       
       const roomRef = doc(db, 'game_rooms', roomId);
       
-      // Sync essential game state (without sensitive data like cards)
+      // Sync essential game state (without sensitive data like player cards)
+      // CRITICAL: Don't sync player cards for security, but sync everything else
+      const safeGameState = {
+        players: (gameState.players || []).map(p => ({
+          id: p.id,
+          name: p.name || 'Player',
+          avatarURL: p.avatarURL || '/assets/boy.svg',
+          chips: (typeof p.chips === 'number' && !isNaN(p.chips)) ? p.chips : 0,
+          bet: (typeof p.bet === 'number' && !isNaN(p.bet)) ? p.bet : 0,
+          folded: p.folded || false,
+          allIn: p.allIn || false,
+          robot: p.robot || false,
+          betReconciled: p.betReconciled || false
+        })),
+        pot: (typeof gameState.pot === 'number' && !isNaN(gameState.pot)) ? gameState.pot : 0,
+        highBet: (typeof gameState.highBet === 'number' && !isNaN(gameState.highBet)) ? gameState.highBet : 20,
+        phase: gameState.phase || 'loading',
+        activePlayerIndex: (typeof gameState.activePlayerIndex === 'number' && gameState.activePlayerIndex !== null && gameState.activePlayerIndex >= 0) ? gameState.activePlayerIndex : 0,
+        communityCards: gameState.communityCards || [], // CRITICAL: Sync community cards
+        dealerIndex: (typeof gameState.dealerIndex === 'number' && gameState.dealerIndex !== null && gameState.dealerIndex >= 0) ? gameState.dealerIndex : 0,
+        blindIndex: gameState.blindIndex || { big: 0, small: 0 },
+        numPlayersActive: (typeof gameState.numPlayersActive === 'number' && !isNaN(gameState.numPlayersActive)) ? gameState.numPlayersActive : (gameState.players?.length || 0),
+        numPlayersFolded: (typeof gameState.numPlayersFolded === 'number' && !isNaN(gameState.numPlayersFolded)) ? gameState.numPlayersFolded : 0,
+        numPlayersAllIn: (typeof gameState.numPlayersAllIn === 'number' && !isNaN(gameState.numPlayersAllIn)) ? gameState.numPlayersAllIn : 0,
+        lastUpdate: new Date().toISOString()
+      };
+      
       await updateDoc(roomRef, {
-        gameState: {
-          players: gameState.players.map(p => ({
-            id: p.id,
-            name: p.name,
-            avatarURL: p.avatarURL,
-            chips: p.chips,
-            bet: p.bet,
-            folded: p.folded,
-            allIn: p.allIn,
-            robot: p.robot || false
-          })),
-          pot: gameState.pot,
-          highBet: gameState.highBet,
-          phase: gameState.phase,
-          activePlayerIndex: gameState.activePlayerIndex,
-          communityCards: gameState.communityCards || [], // CRITICAL: Sync community cards
-          dealerIndex: gameState.dealerIndex,
-          blindIndex: gameState.blindIndex,
-          lastUpdate: new Date().toISOString()
-        },
+        gameState: safeGameState,
         lastUpdate: new Date().toISOString()
       });
-      console.log('💾 Synced game state to Firestore - Phase:', gameState.phase, 'Community cards:', gameState.communityCards?.length || 0);
+      console.log('💾 Synced game state to Firestore - Phase:', safeGameState.phase, 'ActivePlayer:', safeGameState.activePlayerIndex, 'Community cards:', safeGameState.communityCards?.length || 0, 'Pot:', safeGameState.pot);
     } catch (error) {
       console.error('Error syncing game state to Firestore:', error);
     }
