@@ -322,6 +322,17 @@ const useGameStore = create((set, get) => ({
     );
 
     const newState = handleBet(cloneDeep(state), parseInt(bet, 10), parseInt(min, 10), parseInt(max, 10));
+    
+    // Update lastActionRound for the player who just acted
+    const currentRound = state.currentRound || 1;
+    if (newState.players && newState.players[state.activePlayerIndex]) {
+      // Find the player who just bet (might be different index after bet)
+      const bettingPlayer = newState.players.find(p => p.id === activePlayer.id);
+      if (bettingPlayer) {
+        bettingPlayer.lastActionRound = currentRound;
+      }
+    }
+    
     console.log('🎯 Bet action - new activePlayerIndex:', newState.activePlayerIndex, 'Phase:', newState.phase, 'Community cards:', newState.communityCards?.length || 0);
     set(newState);
 
