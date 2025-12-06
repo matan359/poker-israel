@@ -460,11 +460,48 @@ const useGameStore = create((set, get) => ({
     }
   },
 
-  handleNextRound: () => {
+  handleNextRound: async () => {
     const state = get();
     set({ clearCards: true });
     
+    const playersBefore = state.players ? [...state.players] : [];
     const newState = beginNextRound(cloneDeep(state));
+    const playersAfter = newState.players || [];
+    
+    // Check if any players were removed (inactive players)
+    const removedPlayers = playersBefore.filter(p => 
+      !p.robot && !playersAfter.find(pa => pa.id === p.id)
+    );
+    
+    // Remove inactive players from Firestore
+    if (removedPlayers.length > 0 && state.roomId) {
+      try {
+        const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+        const { db } = await import('../config/firebase');
+        const roomRef = doc(db, 'game_rooms', state.roomId);
+        const roomSnap = await getDoc(roomRef);
+        
+        if (roomSnap.exists()) {
+          const roomData = roomSnap.data();
+          const currentPlayers = roomData.players || [];
+          
+          // Remove inactive players from Firestore
+          const updatedPlayers = currentPlayers.filter(p => 
+            !removedPlayers.find(rp => rp.id === p.id)
+          );
+          
+          if (updatedPlayers.length !== currentPlayers.length) {
+            await updateDoc(roomRef, {
+              players: updatedPlayers,
+              lastUpdate: new Date().toISOString()
+            });
+            console.log(`✅ Removed ${removedPlayers.length} inactive player(s) from Firestore`);
+          }
+        }
+      } catch (error) {
+        console.error('Error removing inactive players from Firestore:', error);
+      }
+    }
     
     if (checkWin(newState.players)) {
       set({ winnerFound: true });
