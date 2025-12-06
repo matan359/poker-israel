@@ -507,12 +507,14 @@ const useGameStore = create((set, get) => ({
     }
     
     if (checkWin(newState.players)) {
+      console.log('🏆 Winner found! Only one player remaining.');
       set({ winnerFound: true });
       return;
     }
 
+    // Reset winnerFound if we're continuing to play (more than 1 player)
     console.log('🔄 Starting next round - Phase:', newState.phase, 'ActivePlayer:', newState.activePlayerIndex);
-    set(newState);
+    set({ ...newState, winnerFound: null });
     
     // CRITICAL: Sync game state to Firestore after starting new round
     get().syncGameStateToFirestore(newState);
