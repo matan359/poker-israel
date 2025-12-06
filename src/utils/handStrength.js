@@ -51,13 +51,14 @@ export const calculateHandStrength = (playerCards, communityCards) => {
   
   // checkStraightFlush returns an object with isStraightFlush property
   let isStraightFlush = false;
-  if (isFlush) {
+  if (isFlush && flushCards.length >= 5) {
     const straightFlushResult = checkStraightFlush(flushCards);
     isStraightFlush = straightFlushResult?.isStraightFlush || false;
   }
   
+  // checkStraight returns an object with isStraight property
   const straightResult = checkStraight(valueSet);
-  const isStraight = straightResult?.isStraight || false;
+  const isStraight = straightResult ? (straightResult.isStraight || false) : false;
   const { isFourOfAKind, isFullHouse, isThreeOfAKind, isTwoPair, isPair } = analyzeHistogram(descendingSortHand, frequencyHistogram);
   
   // Determine hand strength
