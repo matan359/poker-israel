@@ -816,7 +816,22 @@ img {
 	
 	/* Mobile dealer */
 	.dealer-container {
-		top: 1% !important;
+		top: 0.3% !important;
+	}
+	
+	/* Mobile - larger chip display */
+	.player-info--stash--container,
+	.player-info--bet--container {
+		font-size: 18px !important;
+		gap: 10px !important;
+		padding: 6px 10px !important;
+		z-index: 30 !important;
+	}
+	
+	.player-info--stash--image,
+	.player-info--bet--image {
+		height: 32px !important;
+		width: 32px !important;
 	}
 }
 
