@@ -324,7 +324,7 @@ img {
  	align-items: center;
  	flex-wrap: nowrap;
 
- 	top: calc(39.5% - 60px);
+ 	top: 42%;
  	left: 50%;
  	transform: translateX(-50%);
  	
@@ -332,6 +332,7 @@ img {
  	min-width: fit-content;
  	height: 120px;
  	gap: 12px;
+ 	z-index: 18;
  }
 
  .community-card-container .playing-card {
