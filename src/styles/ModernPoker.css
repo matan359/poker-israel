@@ -462,6 +462,7 @@ body {
   justify-content: center;
   grid-column: 2;
   position: relative;
+  transform: scale(1.2);
 }
 
 /* User info on left */
