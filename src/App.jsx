@@ -910,6 +910,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/store"
+            element={
+              <ProtectedRoute>
+                <StoreWrapper />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </ErrorBoundary>
