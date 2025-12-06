@@ -20,6 +20,7 @@ const Player = (props) => {
     phase,
     clearCards,
     isCurrentUser = false, // Is this the current user's player?
+    communityCards = [], // Community cards for hand strength calculation
     player: {
       robot,
       folded,
