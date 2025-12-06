@@ -14,7 +14,8 @@ const renderPhaseStatement = (phase) => {
 	switch(phase) {
 		case('loading'): return 'Finding a Table, Please Wait';
 		case('initialDeal'): return 'Dealing out the cards';
-		case('betting1'): return 'Betting 1';
+		case('preflop'):
+		case('betting1'): return 'Preflop';
 		case('flop'): return 'Flop';
 		case('betting2'): return 'Flop';
 		case('turn'): return 'Turn';

@@ -31,6 +31,7 @@ const handleAI = (state, pushAnimationState) => {
 	const highCard = Math.max(...preFlopValues)
 	const lowCard = Math.min(...preFlopValues)
 	switch(state.phase) {
+		case('preflop'):
 		case('betting1'): { 
 			const suited = Object.entries(suitHistogram).find(keyValuePair => keyValuePair[1] === 2)		
 			const straightGap = (highCard - lowCard <= 4)
