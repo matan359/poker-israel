@@ -59,27 +59,103 @@ img {
 
 */
 
-/* Playing Card Styles */
+/* Playing Card Styles - Realistic Design */
 
 .playing-card {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
+	position: relative;
 
-	background-color: white;
-	font-size: 1.4em;
-
-	height: 90px;
-	width: 65px;
-	margin: 0 3px;
-	border: 2px solid #333;
-	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-
+	background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+	background-color: #ffffff;
+	
+	height: 120px;
+	width: 85px;
+	margin: 0 4px;
+	
+	border: 1px solid #1a1a1a;
+	border-radius: 10px;
+	
+	box-shadow: 
+		0 4px 12px rgba(0, 0, 0, 0.25),
+		0 2px 4px rgba(0, 0, 0, 0.15),
+		inset 0 1px 0 rgba(255, 255, 255, 0.8);
+	
 	opacity: 0;
 	animation: fade-in-up 0.5s;
 	animation-fill-mode: both;
+	
+	transition: all 0.3s ease;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.playing-card:hover {
+	transform: translateY(-8px) scale(1.08);
+	box-shadow: 
+		0 8px 20px rgba(0, 0, 0, 0.35),
+		0 4px 8px rgba(0, 0, 0, 0.2),
+		inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	z-index: 10;
+}
+
+.playing-card.red-suit {
+	color: #d32f2f;
+}
+
+.playing-card.black-suit {
+	color: #1a1a1a;
+}
+
+/* Card corners - value and suit */
+.card-corner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 6px 4px;
+	font-weight: bold;
+}
+
+.card-corner-top {
+	align-self: flex-start;
+}
+
+.card-corner-bottom {
+	align-self: flex-end;
+	transform: rotate(180deg);
+}
+
+.card-value {
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 1;
+	margin-bottom: 2px;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.card-suit-small {
+	font-size: 14px;
+	line-height: 1;
+}
+
+/* Center suit symbol */
+.card-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex: 1;
+	width: 100%;
+}
+
+.card-suit-large {
+	font-size: 42px;
+	line-height: 1;
+	opacity: 0.9;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 .robotcard {
 	background-color: #890808;
