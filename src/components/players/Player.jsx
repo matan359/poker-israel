@@ -40,6 +40,11 @@ const Player = (props) => {
   }
 
   const renderPlayerCards = () => {
+    // Safety check: ensure cards exists and is an array
+    if (!cards || !Array.isArray(cards)) {
+      return null;
+    }
+
     let applyFoldedClassname;
 
     if (folded || clearCards) {

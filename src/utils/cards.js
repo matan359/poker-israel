@@ -111,6 +111,10 @@ const dealPrivateCards = (state) => {
 	// Deal 2 cards to each player
 	for (let i = 0; i < state.players.length; i++) {
 		const playerIndex = (state.activePlayerIndex + i) % state.players.length;
+		// Safety check: ensure player and cards array exist
+		if (!state.players[playerIndex] || !state.players[playerIndex].cards) {
+			state.players[playerIndex].cards = [];
+		}
 		while (state.players[playerIndex].cards.length < 2) {
 			const { mutableDeckCopy, chosenCards } = popCards(state.deck, 1);
 			

@@ -3,7 +3,7 @@
  * Handles bonuses, store, transactions, and chip management
  */
 import { create } from 'zustand';
-import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import useAuthStore from './authStore';
 
