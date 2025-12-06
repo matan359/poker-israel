@@ -25,6 +25,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Lock files (we'll use package-lock.json only)
+yarn.lock
+
 # IDE
 .vscode/
 .idea/
