@@ -3,7 +3,7 @@
  * Allows admins to manage tables, players, and system settings
  */
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { showAlert, showConfirm, showPrompt } from '../../utils/dialogs';
 import './Admin.css';
