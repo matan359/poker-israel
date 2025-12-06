@@ -653,6 +653,42 @@ img {
 	align-items: center;
 	margin-bottom: 8px;
 	height: 112px;
+	padding: 12px;
+	border-radius: 15px;
+	transition: all 0.3s ease;
+}
+
+.showdown-player--entity.showdown-winner {
+	border: 3px solid #4EB04E;
+	background: rgba(78, 176, 78, 0.15);
+	box-shadow: 
+		0 0 20px rgba(78, 176, 78, 0.6),
+		0 0 40px rgba(78, 176, 78, 0.3),
+		inset 0 0 15px rgba(78, 176, 78, 0.1);
+	animation: winnerGlow 2s ease-in-out infinite;
+}
+
+.showdown-player--entity.showdown-loser {
+	border: 3px solid #97241B;
+	background: rgba(151, 36, 27, 0.15);
+	box-shadow: 
+		0 0 15px rgba(151, 36, 27, 0.4),
+		inset 0 0 10px rgba(151, 36, 27, 0.1);
+}
+
+@keyframes winnerGlow {
+	0%, 100% {
+		box-shadow: 
+			0 0 20px rgba(78, 176, 78, 0.6),
+			0 0 40px rgba(78, 176, 78, 0.3),
+			inset 0 0 15px rgba(78, 176, 78, 0.1);
+	}
+	50% {
+		box-shadow: 
+			0 0 30px rgba(78, 176, 78, 0.8),
+			0 0 60px rgba(78, 176, 78, 0.5),
+			inset 0 0 20px rgba(78, 176, 78, 0.2);
+	}
 }
 
 
@@ -743,19 +779,37 @@ img {
 }
 
 .showdown--nextRound--button {
-	background-color: #6C0C02;
-	border: 1px solid white;
-	color: salmon;
-	padding: 12px 24px;
+	background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
+	border: 2px solid #00FFFF;
+	color: #FFFFFF;
+	padding: 12px 30px;
 	line-height: 1;
 	font-size: 16px;
+	font-weight: 700;
 	margin: 20px auto;
-	border-radius: 4px;
+	border-radius: 10px;
 	cursor: pointer;
 	display: block;
+	position: relative;
+	z-index: 1000;
+	box-shadow: 
+		0 0 20px rgba(0, 255, 255, 0.7),
+		0 4px 15px rgba(0, 0, 0, 0.4),
+		inset 0 0 10px rgba(0, 102, 255, 0.3);
+	text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+	transition: all 0.3s ease;
+	text-transform: uppercase;
+	letter-spacing: 1px;
 }
+
 .showdown--nextRound--button:hover {
 	cursor: pointer;
+	background: linear-gradient(135deg, #00BFFF 0%, #0066FF 100%);
+	box-shadow: 
+		0 0 30px rgba(0, 255, 255, 1),
+		0 6px 20px rgba(0, 0, 0, 0.5),
+		inset 0 0 15px rgba(0, 191, 255, 0.4);
+	transform: translateY(-2px) scale(1.05);
 }
 
 @media (min-width: 1080px) {

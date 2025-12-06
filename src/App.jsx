@@ -520,21 +520,22 @@ function GameTable() {
     return playerHierarchy.map((rankSnapshot, index) => {
       if (!rankSnapshot) return null;
       const tie = Array.isArray(rankSnapshot);
+      const isWinner = index === 0; // First in hierarchy is the winner
       return tie ? (
-        <div key={index}>{(rankSnapshot || []).map((player) => player ? renderRankWinner(player) : null)}</div>
+        <div key={index}>{(rankSnapshot || []).map((player) => player ? renderRankWinner(player, isWinner) : null)}</div>
       ) : (
-        renderRankWinner(rankSnapshot)
+        renderRankWinner(rankSnapshot, isWinner)
       );
     });
   };
 
-  const renderRankWinner = (player) => {
+  const renderRankWinner = (player, isWinner = false) => {
     if (!players) return null;
     const playerStateData = players.find((p) => p.name === player.name);
     if (!playerStateData) return null;
 
     return (
-      <div className="showdown-player--entity" key={player.name}>
+      <div className={`showdown-player--entity ${isWinner ? 'showdown-winner' : 'showdown-loser'}`} key={player.name}>
         <ShowdownPlayer
           name={player.name}
           avatarURL={playerStateData.avatarURL}
