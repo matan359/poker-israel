@@ -705,7 +705,7 @@ function GameTable() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
+            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
           zIndex: -999,
           pointerEvents: 'none'
         }}
