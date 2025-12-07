@@ -27,27 +27,32 @@
 
 .chat-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 350px;
-  height: 500px;
-  background: linear-gradient(135deg, #001122 0%, #003366 50%, #001122 100%);
+  top: clamp(80px, 12vh, 100px);
+  right: clamp(15px, 2vw, 20px);
+  width: clamp(300px, 25vw, 380px);
+  height: clamp(400px, 50vh, 600px);
+  max-height: calc(100vh - 200px);
+  background: linear-gradient(135deg, rgba(0, 17, 34, 0.98) 0%, rgba(0, 51, 102, 0.98) 100%);
   border: 2px solid #0066FF;
-  border-radius: 15px;
+  border-radius: clamp(15px, 2vw, 20px);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 30px rgba(0, 102, 255, 0.6);
-  z-index: 100;
+  box-shadow: 
+    0 0 30px rgba(0, 102, 255, 0.8),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .chat-header {
   background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
-  padding: 15px 20px;
+  padding: clamp(12px, 2vh, 15px) clamp(15px, 2vw, 20px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid #FFFFFF;
+  flex-shrink: 0;
 }
 
 .chat-header h3 {
@@ -80,10 +85,23 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 15px;
+  overflow-x: hidden;
+  padding: clamp(12px, 2vh, 15px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: clamp(8px, 1vh, 10px);
+  min-height: 0;
+}
+
+.chat-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(14px, 2vw, 16px);
+  text-align: center;
+  padding: 20px;
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -147,21 +165,24 @@
 
 .chat-input-form {
   display: flex;
-  padding: 15px;
+  padding: clamp(12px, 2vh, 15px);
   border-top: 2px solid #0066FF;
-  gap: 10px;
+  gap: clamp(8px, 1vw, 10px);
+  flex-shrink: 0;
+  background: rgba(0, 17, 34, 0.5);
 }
 
 .chat-input {
   flex: 1;
-  padding: 10px 15px;
-  background: rgba(0, 0, 0, 0.5);
+  padding: clamp(10px, 1.5vh, 12px) clamp(12px, 2vw, 15px);
+  background: rgba(0, 0, 0, 0.6);
   border: 2px solid #0066FF;
-  border-radius: 20px;
+  border-radius: clamp(15px, 2vw, 20px);
   color: #fff;
-  font-size: 14px;
+  font-size: clamp(13px, 1.8vw, 15px);
   outline: none;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .chat-input:focus {
@@ -174,15 +195,17 @@
 }
 
 .chat-send-btn {
-  padding: 10px 20px;
+  padding: clamp(10px, 1.5vh, 12px) clamp(16px, 2.5vw, 20px);
   background: linear-gradient(135deg, #0066FF 0%, #003366 100%);
   border: 2px solid #FFFFFF;
-  border-radius: 20px;
+  border-radius: clamp(15px, 2vw, 20px);
   color: #FFFFFF;
-  font-size: 14px;
+  font-size: clamp(13px, 1.8vw, 15px);
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .chat-send-btn:hover:not(:disabled) {
@@ -197,10 +220,17 @@
 
 @media (max-width: 768px) {
   .chat-container {
-    width: calc(100% - 40px);
-    height: 400px;
-    bottom: 10px;
-    right: 20px;
+    width: calc(100% - 30px);
+    height: clamp(350px, 45vh, 500px);
+    top: clamp(70px, 10vh, 90px);
+    right: 15px;
+    left: 15px;
+    max-width: none;
+  }
+
+  .chat-toggle-btn {
+    bottom: clamp(70px, 12vh, 100px);
+    right: 15px;
   }
 }
 

@@ -71,25 +71,31 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
       </div>
 
       <div className="chat-messages">
-        <AnimatePresence>
-          {messages.map((msg, index) => (
-            <motion.div
-              key={index}
-              className={`chat-message ${msg.playerId === userProfile?.uid ? 'own-message' : ''}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <div className="chat-message-header">
-                <span className="chat-player-name">{msg.playerName}</span>
-                <span className="chat-timestamp">
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-              <div className="chat-message-text">{msg.message}</div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {messages.length === 0 ? (
+          <div className="chat-empty-state">
+            <p>No messages yet. Start the conversation!</p>
+          </div>
+        ) : (
+          <>
+            {messages.map((msg, index) => (
+              <motion.div
+                key={`${msg.timestamp}-${index}`}
+                className={`chat-message ${msg.playerId === userProfile?.uid ? 'own-message' : ''}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="chat-message-header">
+                  <span className="chat-player-name">{msg.playerName}</span>
+                  <span className="chat-timestamp">
+                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                <div className="chat-message-text">{msg.message}</div>
+              </motion.div>
+            ))}
+          </>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -99,11 +105,12 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
           className="chat-input"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="הקלד הודעה..."
           maxLength={200}
+          autoFocus={isOpen}
         />
         <button type="submit" className="chat-send-btn" disabled={!inputMessage.trim()}>
-          Send
+          שלח
         </button>
       </form>
     </motion.div>
