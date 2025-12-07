@@ -29,6 +29,15 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  // Ensure video plays and handles sound
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.log('Video autoplay prevented:', err);
+      });
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -79,15 +88,21 @@ const LoginPage = () => {
   const handleUnmute = () => {
     if (videoRef.current) {
       videoRef.current.muted = false;
+      videoRef.current.volume = 1;
       setIsMuted(false);
       setShowUnmute(false);
+      // Try to play with sound
+      videoRef.current.play().catch(err => {
+        console.log('Error playing video with sound:', err);
+      });
     }
   };
 
   const handleMuteToggle = () => {
     if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
+      const newMutedState = !videoRef.current.muted;
+      videoRef.current.muted = newMutedState;
+      setIsMuted(newMutedState);
     }
   };
 
