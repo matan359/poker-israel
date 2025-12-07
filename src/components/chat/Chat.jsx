@@ -55,7 +55,7 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
                 timestamp: data.timestamp?.toDate?.()?.toISOString() || data.createdAt || data.timestamp,
               };
               
-              // Avoid duplicates
+              // Avoid duplicates and add to end (chronological order)
               setMessages((prev) => {
                 const exists = prev.some(
                   msg => msg.playerId === messageData.playerId && 
@@ -63,7 +63,7 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
                          Math.abs(new Date(msg.timestamp) - new Date(messageData.timestamp)) < 1000
                 );
                 if (exists) return prev;
-                return [messageData, ...prev];
+                return [...prev, messageData];
               });
             }
           });
