@@ -16,8 +16,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [showUnmute, setShowUnmute] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef(null);
   const navigate = useNavigate();
   const { signIn, signUp, signInWithGoogle, isAuthenticated } = useAuthStore();
@@ -32,8 +31,17 @@ const LoginPage = () => {
   // Ensure video plays and handles sound
   React.useEffect(() => {
     if (videoRef.current) {
+      // Try to play with sound by default
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1;
       videoRef.current.play().catch(err => {
-        console.log('Video autoplay prevented:', err);
+        console.log('Video autoplay with sound prevented, trying muted:', err);
+        // If autoplay with sound fails, try muted
+        videoRef.current.muted = true;
+        setIsMuted(true);
+        videoRef.current.play().catch(err2 => {
+          console.log('Video autoplay failed:', err2);
+        });
       });
     }
   }, []);
@@ -85,24 +93,18 @@ const LoginPage = () => {
     }
   };
 
-  const handleUnmute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = false;
-      videoRef.current.volume = 1;
-      setIsMuted(false);
-      setShowUnmute(false);
-      // Try to play with sound
-      videoRef.current.play().catch(err => {
-        console.log('Error playing video with sound:', err);
-      });
-    }
-  };
-
   const handleMuteToggle = () => {
     if (videoRef.current) {
       const newMutedState = !videoRef.current.muted;
       videoRef.current.muted = newMutedState;
+      videoRef.current.volume = newMutedState ? 0 : 1;
       setIsMuted(newMutedState);
+      // Try to play if it was paused
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(err => {
+          console.log('Error playing video:', err);
+        });
+      }
     }
   };
 
@@ -116,6 +118,7 @@ const LoginPage = () => {
           loop
           muted={isMuted}
           playsInline
+          volume={isMuted ? 0 : 1}
         >
           <source src="/assets/intro-video.mp4" type="video/mp4" />
           Your browser does not support the video tag.
@@ -214,33 +217,17 @@ const LoginPage = () => {
         </motion.div>
       </div>
 
-      {showUnmute && (
-        <motion.button
-          className="login-unmute-btn"
-          onClick={handleUnmute}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          🔊 הפעל שמע
-        </motion.button>
-      )}
-
-      {!showUnmute && (
-        <motion.button
-          className="login-mute-toggle-btn"
-          onClick={handleMuteToggle}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          {isMuted ? '🔇' : '🔊'}
-        </motion.button>
-      )}
+      <motion.button
+        className="login-mute-toggle-btn"
+        onClick={handleMuteToggle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        {isMuted ? '🔇' : '🔊'}
+      </motion.button>
     </>
   );
 };
