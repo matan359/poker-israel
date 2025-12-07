@@ -216,6 +216,111 @@
   cursor: not-allowed;
 }
 
+.login-video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -999;
+  overflow: hidden;
+}
+
+.login-background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.login-video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+.login-unmute-btn {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: clamp(16px, 3vw, 20px) clamp(32px, 6vw, 40px);
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.95) 0%, rgba(0, 51, 102, 0.95) 100%);
+  border: 3px solid #FFFFFF;
+  border-radius: clamp(25px, 5vw, 35px);
+  color: #FFFFFF;
+  font-size: clamp(18px, 3.5vw, 24px);
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 
+    0 0 30px rgba(0, 102, 255, 0.8),
+    0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-unmute-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 191, 255, 1) 0%, rgba(0, 102, 255, 1) 100%);
+  box-shadow: 
+    0 0 40px rgba(0, 255, 255, 1),
+    0 8px 25px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.login-unmute-btn:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.login-mute-toggle-btn {
+  position: fixed;
+  top: clamp(30px, 5vh, 50px);
+  left: clamp(30px, 5vw, 50px);
+  width: clamp(50px, 8vw, 60px);
+  height: clamp(50px, 8vw, 60px);
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
+  border: 2px solid #FFFFFF;
+  border-radius: 50%;
+  color: #FFFFFF;
+  font-size: clamp(24px, 4vw, 30px);
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 
+    0 0 20px rgba(0, 102, 255, 0.6),
+    0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-mute-toggle-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.95) 0%, rgba(0, 102, 255, 0.95) 100%);
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.8),
+    0 6px 15px rgba(0, 0, 0, 0.4);
+  transform: scale(1.1);
+}
+
+.login-mute-toggle-btn:active {
+  transform: scale(0.95);
+}
+
 @media (max-width: 768px) {
   .login-page-content {
     padding: 30px 20px;
@@ -224,6 +329,20 @@
   .login-tabs button {
     font-size: 14px;
     padding: 12px;
+  }
+
+  .login-unmute-btn {
+    padding: 14px 28px;
+    font-size: 16px;
+    gap: 10px;
+  }
+
+  .login-mute-toggle-btn {
+    top: 20px;
+    left: 20px;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
   }
 }
 
