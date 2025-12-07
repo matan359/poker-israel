@@ -836,7 +836,7 @@ function GameTable() {
 
       {dailyBonusAvailable && (
         <button
-          className="modern-action-button"
+          className="modern-action-button bonus-button-mobile"
           onClick={handleDailyBonus}
           style={{ position: 'fixed', top: '80px', left: '20px', zIndex: 1001 }}
           aria-label="Claim daily bonus"
@@ -846,7 +846,7 @@ function GameTable() {
       )}
 
       <button
-        className="modern-action-button"
+        className="modern-action-button bonus-button-mobile"
         onClick={() => setShowBonusWheel(true)}
         style={{ position: 'fixed', top: '80px', left: '200px', zIndex: 1001 }}
         aria-label="Spin bonus wheel"

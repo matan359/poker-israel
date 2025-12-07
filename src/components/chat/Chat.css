@@ -229,8 +229,11 @@
   }
 
   .chat-toggle-btn {
-    bottom: clamp(70px, 12vh, 100px);
-    right: 15px;
+    bottom: clamp(90px, 15vh, 120px);
+    right: clamp(10px, 2vw, 15px);
+    padding: clamp(8px, 1.5vh, 10px) clamp(12px, 2.5vw, 16px);
+    font-size: clamp(11px, 2vw, 13px);
+    z-index: 1002;
   }
 }
 

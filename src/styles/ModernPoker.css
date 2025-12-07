@@ -646,16 +646,21 @@ body {
   }
   
   .modern-action-bar {
-    flex-direction: column;
-    padding: 15px 10px;
-    gap: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: clamp(10px, 1.5vh, 12px) clamp(8px, 1.5vw, 10px);
+    gap: clamp(8px, 1.5vw, 10px);
+    min-height: clamp(70px, 12vh, 85px);
+    max-height: clamp(100px, 18vh, 120px);
   }
   
   .modern-action-button {
-    width: 100%;
-    max-width: 100%;
-    padding: 12px 20px;
-    font-size: 16px;
+    flex: 1 1 auto;
+    min-width: clamp(100px, 30vw, 140px);
+    max-width: 48%;
+    padding: clamp(10px, 1.8vh, 12px) clamp(15px, 3vw, 20px);
+    font-size: clamp(14px, 2.5vw, 16px);
   }
   
   .modern-pot-value {
@@ -714,6 +719,54 @@ body {
   .modern-table-container {
     padding-top: 5px;
     padding-bottom: 120px;
+  }
+
+  /* Mobile Bonus Buttons */
+  .bonus-button-mobile {
+    font-size: clamp(10px, 2vw, 12px) !important;
+    padding: clamp(6px, 1.2vh, 8px) clamp(10px, 2vw, 14px) !important;
+    max-width: clamp(120px, 25vw, 160px) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Adjust bonus buttons position on mobile */
+  .bonus-button-mobile:first-of-type {
+    left: clamp(10px, 2vw, 15px) !important;
+    top: clamp(55px, 8vh, 70px) !important;
+  }
+
+  .bonus-button-mobile:last-of-type {
+    left: auto !important;
+    right: clamp(10px, 2vw, 15px) !important;
+    top: clamp(55px, 8vh, 70px) !important;
+  }
+
+  /* Timer adjustments for mobile */
+  .modern-timer {
+    top: clamp(50px, 7vh, 60px) !important;
+    right: clamp(8px, 2vw, 12px) !important;
+    padding: clamp(6px, 1vh, 8px) clamp(10px, 2vw, 14px) !important;
+    font-size: clamp(10px, 1.8vw, 12px) !important;
+  }
+
+  .modern-timer-label {
+    font-size: clamp(8px, 1.5vw, 10px) !important;
+  }
+
+  .modern-timer-value {
+    font-size: clamp(14px, 2.5vw, 18px) !important;
+  }
+
+  /* Back button adjustments */
+  .game-back-btn {
+    padding: clamp(5px, 1vh, 7px) clamp(10px, 2vw, 14px) !important;
+    font-size: clamp(10px, 1.8vw, 12px) !important;
+    position: fixed;
+    top: clamp(50px, 7vh, 60px) !important;
+    left: clamp(8px, 2vw, 12px) !important;
+    z-index: 1002;
   }
 }
 

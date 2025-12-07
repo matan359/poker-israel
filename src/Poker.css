@@ -913,12 +913,27 @@ img {
 		left: unset;
 	}
 	
-	/* Mobile player positions */
-	.p0, .p1, .p4 {
-		bottom: 2% !important;
+	/* Mobile player positions - better spacing */
+	.p0 {
+		bottom: clamp(2%, 3vh, 4%) !important;
+		left: clamp(5%, 8vw, 10%) !important;
 	}
-	.p2, .p3 {
-		top: 28% !important;
+	.p1 {
+		bottom: clamp(2%, 3vh, 4%) !important;
+		right: clamp(5%, 8vw, 10%) !important;
+	}
+	.p4 {
+		bottom: clamp(2%, 3vh, 4%) !important;
+		left: 50% !important;
+		transform: translateX(-50%) !important;
+	}
+	.p2 {
+		top: clamp(25%, 30vh, 32%) !important;
+		left: clamp(5%, 8vw, 10%) !important;
+	}
+	.p3 {
+		top: clamp(25%, 30vh, 32%) !important;
+		right: clamp(5%, 8vw, 10%) !important;
 	}
 	
 	/* Mobile community cards */
