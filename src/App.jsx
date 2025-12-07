@@ -536,6 +536,11 @@ function GameTable() {
     const playerStateData = players.find((p) => p.name === player.name);
     if (!playerStateData) return null;
 
+    // Get hand rank from player object or fallback to playerStateData
+    const handRank = player.handRank || 
+                     playerStateData?.showDownHand?.bestHandRank || 
+                     'Unknown';
+
     return (
       <div className={`showdown-player--entity ${isWinner ? 'showdown-winner' : 'showdown-loser'}`} key={player.name}>
         <ShowdownPlayer
@@ -554,7 +559,7 @@ function GameTable() {
             })}
           </div>
         </div>
-        <div className="showdown--handrank">{player.handRank}</div>
+        <div className="showdown--handrank">{handRank}</div>
         {renderNetPlayerEarnings(playerStateData.roundEndChips, playerStateData.roundStartChips)}
       </div>
     );
