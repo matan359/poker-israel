@@ -109,6 +109,23 @@ service cloud.firestore {
       // Only admins can read/write house profits
       allow read, write: if isAdmin();
     }
+    
+    // ============================================
+    // CHAT COLLECTION (rooms/{roomId}/chat)
+    // ============================================
+    match /rooms/{roomId}/chat/{messageId} {
+      // Players in the room can read chat messages
+      allow read: if isAuthenticated();
+      // Players can create chat messages
+      allow create: if isAuthenticated() && 
+        request.resource.data.playerId == request.auth.uid;
+      // Only message sender can update their own message
+      allow update: if isAuthenticated() && 
+        resource.data.playerId == request.auth.uid;
+      // Only message sender can delete their own message
+      allow delete: if isAuthenticated() && 
+        resource.data.playerId == request.auth.uid;
+    }
   }
 }
 ```
