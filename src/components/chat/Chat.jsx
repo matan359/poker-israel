@@ -14,16 +14,76 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
   const { userProfile } = useAuthStore();
 
   useEffect(() => {
-    if (!socket || !roomId) return;
+    if (!roomId) return;
 
-    const handleMessage = (data) => {
-      setMessages((prev) => [...prev, data]);
+    // Listen for Socket.io messages
+    const handleSocketMessage = (data) => {
+      // Avoid duplicates - check if message already exists
+      setMessages((prev) => {
+        const exists = prev.some(
+          msg => msg.playerId === data.playerId && 
+                 msg.message === data.message && 
+                 msg.timestamp === data.timestamp
+        );
+        if (exists) return prev;
+        return [...prev, data];
+      });
     };
 
-    socket.on('chatMessage', handleMessage);
+    if (socket && socket.connected) {
+      socket.on('chatMessage', handleSocketMessage);
+    }
+
+    // Listen for Firestore messages
+    let unsubscribeFirestore = null;
+    const setupFirestoreListener = async () => {
+      try {
+        const { db } = await import('../../config/firebase');
+        const { collection, query, orderBy, limit, onSnapshot } = await import('firebase/firestore');
+        
+        const chatRef = collection(db, 'rooms', roomId, 'chat');
+        const q = query(chatRef, orderBy('timestamp', 'desc'), limit(50));
+        
+        unsubscribeFirestore = onSnapshot(q, (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              const data = change.doc.data();
+              const messageData = {
+                playerId: data.playerId,
+                playerName: data.playerName || 'Anonymous',
+                message: data.message,
+                timestamp: data.timestamp?.toDate?.()?.toISOString() || data.createdAt || data.timestamp,
+              };
+              
+              // Avoid duplicates
+              setMessages((prev) => {
+                const exists = prev.some(
+                  msg => msg.playerId === messageData.playerId && 
+                         msg.message === messageData.message && 
+                         Math.abs(new Date(msg.timestamp) - new Date(messageData.timestamp)) < 1000
+                );
+                if (exists) return prev;
+                return [messageData, ...prev];
+              });
+            }
+          });
+        }, (error) => {
+          console.error('Firestore chat listener error:', error);
+        });
+      } catch (error) {
+        console.warn('Firestore not available for chat:', error);
+      }
+    };
+
+    setupFirestoreListener();
 
     return () => {
-      socket.off('chatMessage', handleMessage);
+      if (socket) {
+        socket.off('chatMessage', handleSocketMessage);
+      }
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+      }
     };
   }, [socket, roomId]);
 
@@ -40,9 +100,9 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
     }
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !socket || !roomId) return;
+    if (!inputMessage.trim() || !roomId) return;
 
     const messageData = {
       playerId: userProfile?.uid,
@@ -51,8 +111,39 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
       timestamp: new Date().toISOString(),
     };
 
-    socket.emit('chatMessage', { roomId, ...messageData });
+    // Optimistic update - add message immediately so sender sees it
+    setMessages((prev) => [...prev, messageData]);
     setInputMessage('');
+
+    // Try Socket.io first if available
+    if (socket && socket.connected) {
+      try {
+        socket.emit('chatMessage', { roomId, ...messageData });
+      } catch (error) {
+        console.warn('Socket emit failed, using Firestore:', error);
+        // Fallback to Firestore
+        await sendChatMessageViaFirestore(roomId, messageData);
+      }
+    } else {
+      // Use Firestore if Socket.io is not available
+      await sendChatMessageViaFirestore(roomId, messageData);
+    }
+  };
+
+  const sendChatMessageViaFirestore = async (roomId, messageData) => {
+    try {
+      const { db } = await import('../../config/firebase');
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+      
+      const chatRef = collection(db, 'rooms', roomId, 'chat');
+      await addDoc(chatRef, {
+        ...messageData,
+        timestamp: serverTimestamp(),
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error sending chat message via Firestore:', error);
+    }
   };
 
   if (!isOpen) {
