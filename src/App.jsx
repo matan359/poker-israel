@@ -23,7 +23,6 @@ import Spinner from './Spinner';
 import WinScreen from './WinScreen';
 import ErrorBoundary from './components/ErrorBoundary';
 import Store from './components/store/Store';
-import IntroVideo from './components/intro/IntroVideo';
 
 // Utils
 import { renderShowdownMessages, renderActionButtonText, renderNetPlayerEarnings, renderActionMenu } from './utils/ui';
@@ -856,28 +855,10 @@ function StoreWrapper() {
 function App() {
   const { isAuthenticated, loading: authLoading, initAuth } = useAuthStore();
   const { initializeGame } = useGameStore();
-  const [showIntro, setShowIntro] = useState(true);
-  const [introCompleted, setIntroCompleted] = useState(false);
 
   useEffect(() => {
     initAuth();
-    // Check if intro video was already played
-    const playedBefore = localStorage.getItem('introVideoPlayed');
-    if (playedBefore === 'true') {
-      setShowIntro(false);
-      setIntroCompleted(true);
-    }
   }, [initAuth]);
-
-  const handleIntroComplete = () => {
-    setShowIntro(false);
-    setIntroCompleted(true);
-  };
-
-  const handleIntroSkip = () => {
-    setShowIntro(false);
-    setIntroCompleted(true);
-  };
 
   if (authLoading) {
     return (
@@ -910,12 +891,9 @@ function App() {
 
   return (
     <ErrorBoundary>
-      {showIntro && !introCompleted ? (
-        <IntroVideo onComplete={handleIntroComplete} onSkip={handleIntroSkip} />
-      ) : (
-        <Router>
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
           <Route 
             path="/lobby" 
             element={
@@ -942,7 +920,6 @@ function App() {
           />
         </Routes>
       </Router>
-      )}
     </ErrorBoundary>
   );
 }

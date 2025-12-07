@@ -2,7 +2,7 @@
  * Login Page Component
  * Main entry point - login/register page before accessing lobby
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAuthStore from '../../store/authStore';
@@ -16,6 +16,9 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showUnmute, setShowUnmute] = useState(true);
+  const videoRef = useRef(null);
   const navigate = useNavigate();
   const { signIn, signUp, signInWithGoogle, isAuthenticated } = useAuthStore();
 
@@ -73,25 +76,37 @@ const LoginPage = () => {
     }
   };
 
+  const handleUnmute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      setIsMuted(false);
+      setShowUnmute(false);
+    }
+  };
+
+  const handleMuteToggle = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
   return (
     <>
-      <div 
-        className="modern-poker-background"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundImage: 'url(/assets/poker-table-background.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          zIndex: -999,
-          pointerEvents: 'none'
-        }}
-      />
+      <div className="login-video-background">
+        <video
+          ref={videoRef}
+          className="login-background-video"
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+        >
+          <source src="/assets/intro-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="login-video-overlay"></div>
+      </div>
       <div className="login-page-container">
         <motion.div
           className="login-page-content"
@@ -183,6 +198,34 @@ const LoginPage = () => {
           </button>
         </motion.div>
       </div>
+
+      {showUnmute && (
+        <motion.button
+          className="login-unmute-btn"
+          onClick={handleUnmute}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          🔊 הפעל שמע
+        </motion.button>
+      )}
+
+      {!showUnmute && (
+        <motion.button
+          className="login-mute-toggle-btn"
+          onClick={handleMuteToggle}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </motion.button>
+      )}
     </>
   );
 };
