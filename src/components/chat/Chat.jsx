@@ -42,7 +42,8 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
         const { collection, query, orderBy, limit, onSnapshot } = await import('firebase/firestore');
         
         const chatRef = collection(db, 'rooms', roomId, 'chat');
-        const q = query(chatRef, orderBy('timestamp', 'desc'), limit(50));
+        // Order by timestamp ascending for chronological order (oldest first)
+        const q = query(chatRef, orderBy('timestamp', 'asc'), limit(50));
         
         unsubscribeFirestore = onSnapshot(q, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
