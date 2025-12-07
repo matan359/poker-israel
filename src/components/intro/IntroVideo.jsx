@@ -9,6 +9,8 @@ import './IntroVideo.css';
 const IntroVideo = ({ onComplete, onSkip }) => {
   const [showSkip, setShowSkip] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showUnmute, setShowUnmute] = useState(true);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -43,6 +45,21 @@ const IntroVideo = ({ onComplete, onSkip }) => {
     onSkip();
   };
 
+  const handleUnmute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      setIsMuted(false);
+      setShowUnmute(false);
+    }
+  };
+
+  const handleMuteToggle = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
   const handleVideoError = () => {
     console.error('Error loading intro video');
     // If video fails to load, skip to login
@@ -63,7 +80,7 @@ const IntroVideo = ({ onComplete, onSkip }) => {
             ref={videoRef}
             className="intro-video"
             autoPlay
-            muted
+            muted={isMuted}
             playsInline
             onEnded={handleVideoEnd}
             onError={handleVideoError}
@@ -71,6 +88,34 @@ const IntroVideo = ({ onComplete, onSkip }) => {
             <source src="/assets/intro-video.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
+
+          {showUnmute && (
+            <motion.button
+              className="intro-unmute-btn"
+              onClick={handleUnmute}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              🔊 הפעל שמע
+            </motion.button>
+          )}
+
+          {!showUnmute && (
+            <motion.button
+              className="intro-mute-toggle-btn"
+              onClick={handleMuteToggle}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </motion.button>
+          )}
 
           {showSkip && (
             <motion.button
