@@ -38,9 +38,9 @@ const Player = (props) => {
   const renderDealerChip = () => {
     if (hasDealerChip) {
       return (
-        <div className="dealer-chip-icon-container">
-          <img src={dealerChipImageURL} alt="Dealer Chip"/>
-        </div>
+      <div className="dealer-chip-icon-container" aria-label="Dealer">
+        <img src={dealerChipImageURL} alt="Dealer Chip" loading="lazy"/>
+      </div>
       )
     } else return null;
   }
@@ -128,12 +128,12 @@ const Player = (props) => {
           <h5 className="player-info--name" style={{'fontSize': (name.length < 14) ? 12 : 10}}>
             {`${name}`}
           </h5>
-          <div className="player-info--stash--container">
-            <img className="player-info--stash--image" src={chipCountImageURL} alt="Player Stash"/>
+          <div className="player-info--stash--container" aria-label={`${name} has ${chips} chips`}>
+            <img className="player-info--stash--image" src={chipCountImageURL} alt="Chips" loading="lazy"/>
             <h5>{typeof chips === 'number' && !isNaN(chips) ? chips.toLocaleString() : '0'}</h5>
           </div>
-          <div className="player-info--bet--container">
-            <img className="player-info--bet--image" src={playerBetImageURL} alt="Player Bet" />
+          <div className="player-info--bet--container" aria-label={`${name} bet ${bet} chips`}>
+            <img className="player-info--bet--image" src={playerBetImageURL} alt="Bet" loading="lazy"/>
             <h5>{`Bet: ${typeof bet === 'number' && !isNaN(bet) ? bet : 0}`}</h5>
           </div>
           { renderDealerChip() }

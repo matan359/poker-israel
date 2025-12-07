@@ -100,6 +100,7 @@ const Dealer = ({ phase, message, isAnnouncing, onTipDealer, showTipButton }) =>
           className="dealer-tip-button"
           onClick={onTipDealer}
           title="Tip Dealer 100 chips"
+          aria-label="Tip dealer 100 chips"
         >
           💰 100
         </button>

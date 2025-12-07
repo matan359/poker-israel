@@ -33,6 +33,7 @@ import { showAlert } from './utils/dialogs';
 import './App.css';
 import './Poker.css';
 import './styles/ModernPoker.css';
+import './styles/WaitingPlayer.css';
 
 function GameTable() {
   const [showAuth, setShowAuth] = useState(false);
@@ -508,7 +509,11 @@ function GameTable() {
         <div className="showdown-container--community-cards">
           {renderCommunityCards(true)}
         </div>
-        <button className="showdown--nextRound--button" onClick={handleNextRound}>
+        <button 
+          className="showdown--nextRound--button" 
+          onClick={handleNextRound}
+          aria-label="Start next round"
+        >
           Next Round
         </button>
         {renderBestHands()}
@@ -574,7 +579,7 @@ function GameTable() {
     const isCurrentUserTurn = activePlayer.id === userProfile.uid;
     if (!isCurrentUserTurn) {
       return (
-        <div className="waiting-for-player">
+        <div className="waiting-for-player" role="status" aria-live="polite">
           <p>ממתין ל-{activePlayer.name}...</p>
         </div>
       );
@@ -588,10 +593,15 @@ function GameTable() {
         <button
           className="modern-action-button"
           onClick={() => handleBetInputSubmit(betInputValue, min, max)}
+          aria-label={`${renderActionButtonText(highBet, betInputValue, activePlayer)} - Bet ${betInputValue || min} chips`}
         >
           {renderActionButtonText(highBet, betInputValue, activePlayer)}
         </button>
-        <button className="modern-action-button fold" onClick={handleFold}>
+        <button 
+          className="modern-action-button fold" 
+          onClick={handleFold}
+          aria-label="Fold your hand"
+        >
           Fold
         </button>
       </>
@@ -738,7 +748,9 @@ function GameTable() {
             src="/assets/table-nobg-svg-01.svg"
             alt="Poker Table"
             onError={(e) => {
-              console.error('Failed to load table image');
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Failed to load table image');
+              }
               e.target.style.display = 'none';
             }}
           />
@@ -783,9 +795,12 @@ function GameTable() {
               className="modern-pot-icon"
               style={{ height: 55, width: 55 }}
               src="/assets/pot.svg"
-              alt="Pot Value"
+              alt={`Pot: ${pot || 0} chips`}
+              loading="lazy"
               onError={(e) => {
-                console.error('Failed to load pot icon');
+                if (process.env.NODE_ENV === 'development') {
+                  console.error('Failed to load pot icon');
+                }
                 e.target.style.display = 'none';
               }}
             />
@@ -823,6 +838,7 @@ function GameTable() {
           className="modern-action-button"
           onClick={handleDailyBonus}
           style={{ position: 'fixed', top: '80px', left: '20px', zIndex: 1001 }}
+          aria-label="Claim daily bonus"
         >
           Claim Daily Bonus
         </button>
@@ -832,6 +848,7 @@ function GameTable() {
         className="modern-action-button"
         onClick={() => setShowBonusWheel(true)}
         style={{ position: 'fixed', top: '80px', left: '200px', zIndex: 1001 }}
+        aria-label="Spin bonus wheel"
       >
         Bonus Wheel
       </button>

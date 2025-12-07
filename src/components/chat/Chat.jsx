@@ -67,7 +67,13 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
     >
       <div className="chat-header">
         <h3>Chat</h3>
-        <button className="chat-close-btn" onClick={onToggle}>×</button>
+        <button 
+          className="chat-close-btn" 
+          onClick={onToggle}
+          aria-label="Close chat"
+        >
+          ×
+        </button>
       </div>
 
       <div className="chat-messages">
@@ -109,7 +115,12 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
           maxLength={200}
           autoFocus={isOpen}
         />
-        <button type="submit" className="chat-send-btn" disabled={!inputMessage.trim()}>
+        <button 
+          type="submit" 
+          className="chat-send-btn" 
+          disabled={!inputMessage.trim()}
+          aria-label="Send message"
+        >
           שלח
         </button>
       </form>

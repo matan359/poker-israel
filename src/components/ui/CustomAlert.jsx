@@ -62,7 +62,12 @@ const CustomAlert = ({ isOpen, message, type = 'info', onClose, title }) => {
               <p className="custom-alert-message">{message}</p>
             </div>
             <div className="custom-alert-footer">
-              <button className="custom-alert-btn" onClick={onClose}>
+              <button 
+                className="custom-alert-btn" 
+                onClick={onClose}
+                aria-label="Close alert"
+                autoFocus
+              >
                 אישור
               </button>
             </div>

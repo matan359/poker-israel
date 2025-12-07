@@ -35,10 +35,19 @@ const CustomConfirm = ({ isOpen, message, title, onConfirm, onCancel, confirmTex
               <p className="custom-confirm-message">{message}</p>
             </div>
             <div className="custom-confirm-footer">
-              <button className="custom-confirm-btn custom-confirm-btn-cancel" onClick={onCancel}>
+              <button 
+                className="custom-confirm-btn custom-confirm-btn-cancel" 
+                onClick={onCancel}
+                aria-label="Cancel action"
+              >
                 {cancelText}
               </button>
-              <button className="custom-confirm-btn custom-confirm-btn-confirm" onClick={onConfirm}>
+              <button 
+                className="custom-confirm-btn custom-confirm-btn-confirm" 
+                onClick={onConfirm}
+                aria-label="Confirm action"
+                autoFocus
+              >
                 {confirmText}
               </button>
             </div>

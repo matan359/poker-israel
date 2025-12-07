@@ -583,6 +583,28 @@ body {
   margin: 0;
 }
 
+/* Enhanced Tablet Responsiveness */
+@media (max-width: 1024px) {
+  .modern-player-avatar {
+    width: clamp(70px, 10vw, 90px);
+    height: clamp(70px, 10vw, 90px);
+  }
+
+  .modern-player-info {
+    min-width: clamp(100px, 15vw, 120px);
+    padding: clamp(8px, 1.5vh, 10px) clamp(10px, 2vw, 15px);
+  }
+
+  .modern-pot-value {
+    font-size: clamp(24px, 4vw, 28px);
+  }
+
+  .modern-pot-icon {
+    width: clamp(50px, 8vw, 70px);
+    height: clamp(50px, 8vw, 70px);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .modern-player-avatar {

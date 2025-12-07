@@ -77,10 +77,18 @@ const CustomPrompt = ({ isOpen, message, title, defaultValue = '', onConfirm, on
               />
             </div>
             <div className="custom-prompt-footer">
-              <button className="custom-prompt-btn custom-prompt-btn-cancel" onClick={handleCancel}>
+              <button 
+                className="custom-prompt-btn custom-prompt-btn-cancel" 
+                onClick={handleCancel}
+                aria-label="Cancel input"
+              >
                 ביטול
               </button>
-              <button className="custom-prompt-btn custom-prompt-btn-confirm" onClick={handleConfirm}>
+              <button 
+                className="custom-prompt-btn custom-prompt-btn-confirm" 
+                onClick={handleConfirm}
+                aria-label="Confirm input"
+              >
                 אישור
               </button>
             </div>

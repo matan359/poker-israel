@@ -1,0 +1,42 @@
+/**
+ * Waiting for Player Styles
+ */
+.waiting-for-player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 2vh, 15px);
+  background: rgba(0, 102, 255, 0.2);
+  border: 2px solid rgba(0, 255, 255, 0.5);
+  border-radius: clamp(10px, 2vw, 15px);
+  color: #FFFFFF;
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  animation: pulse 2s ease-in-out infinite;
+  min-width: fit-content;
+}
+
+.waiting-for-player p {
+  margin: 0;
+  text-align: center;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+  }
+}
+
+@media (max-width: 768px) {
+  .waiting-for-player {
+    padding: clamp(8px, 1.5vh, 12px);
+    font-size: clamp(12px, 2vw, 16px);
+  }
+}
+
