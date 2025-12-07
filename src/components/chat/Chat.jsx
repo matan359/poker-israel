@@ -32,7 +32,12 @@ const Chat = ({ socket, roomId, isOpen, onToggle }) => {
   }, [messages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Use instant scroll for better performance, or requestAnimationFrame for smooth
+    if (messagesEndRef.current) {
+      requestAnimationFrame(() => {
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+      });
+    }
   };
 
   const handleSendMessage = (e) => {

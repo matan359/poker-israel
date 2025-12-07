@@ -54,7 +54,10 @@
 .dealer-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.7));
+  /* Optimized - use box-shadow instead of filter */
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+  will-change: box-shadow;
+  transform: translateZ(0);
 }
 
 .dealer-speech-bubble {

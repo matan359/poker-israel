@@ -34,6 +34,7 @@ import './App.css';
 import './Poker.css';
 import './styles/ModernPoker.css';
 import './styles/WaitingPlayer.css';
+import './styles/ScrollOptimization.css';
 
 function GameTable() {
   const [showAuth, setShowAuth] = useState(false);
@@ -637,7 +638,7 @@ function GameTable() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
+            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
             zIndex: -999,
             pointerEvents: 'none'
           }}
@@ -678,7 +679,7 @@ function GameTable() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
+            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
             zIndex: -999,
             pointerEvents: 'none'
           }}
@@ -898,7 +899,7 @@ function App() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
+            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
             zIndex: -999,
             pointerEvents: 'none'
           }}
@@ -973,7 +974,7 @@ function ProtectedRoute({ children }) {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
+            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
             zIndex: -999,
             pointerEvents: 'none'
           }}

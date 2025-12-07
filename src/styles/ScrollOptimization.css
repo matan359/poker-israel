@@ -1,0 +1,55 @@
+/**
+ * Scroll Performance Optimization
+ * Global optimizations for smooth scrolling
+ */
+
+/* Enable hardware acceleration for smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* Prevent scroll lag */
+  overflow-x: hidden;
+}
+
+/* Optimize fixed/absolute positioned elements */
+[class*="fixed"],
+[class*="absolute"] {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Optimize elements with transforms */
+[class*="transform"],
+[class*="animate"] {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce repaints during scroll */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize images during scroll */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Disable smooth scroll on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

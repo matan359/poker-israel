@@ -35,6 +35,9 @@ body {
   background: transparent;
   color: var(--white);
   overflow-x: hidden;
+  /* Smooth scrolling optimization */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Modern Poker Table Background */
@@ -47,9 +50,11 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Removed background-attachment: fixed - causes scroll lag */
   z-index: -1;
   min-height: 100vh;
+  will-change: transform;
+  transform: translateZ(0);
   /* Background image is set via inline style in App.jsx */
 }
 
@@ -253,13 +258,16 @@ body {
 .modern-pot-icon {
   width: 80px;
   height: 80px;
-  filter: drop-shadow(0 0 20px var(--cyan-glow));
+  /* Optimized - use box-shadow instead of filter for better performance */
+  box-shadow: 0 0 20px var(--cyan-glow);
   animation: potGlow 2s ease-in-out infinite;
+  will-change: box-shadow;
+  transform: translateZ(0);
 }
 
 @keyframes potGlow {
-  0%, 100% { filter: drop-shadow(0 0 20px var(--cyan-glow)); }
-  50% { filter: drop-shadow(0 0 30px var(--cyan-glow)); }
+  0%, 100% { box-shadow: 0 0 20px var(--cyan-glow); }
+  50% { box-shadow: 0 0 30px var(--cyan-glow); }
 }
 
 .modern-pot-value {
@@ -280,18 +288,22 @@ body {
   right: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(26, 0, 0, 0.9) 100%);
   border-top: 3px solid var(--primary-blue);
-  box-shadow: 0 -5px 30px var(--blue-glow);
+  box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
   padding: clamp(12px, 2vw, 15px) clamp(15px, 3vw, 20px);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: clamp(10px, 2vw, 20px);
   z-index: 1000;
-  box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
   height: auto;
   min-height: clamp(70px, 12vh, 80px);
   max-height: clamp(100px, 18vh, 120px);
+  /* Optimized backdrop-filter - only when needed */
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 
 .modern-action-button {
@@ -362,6 +374,10 @@ body {
   box-shadow: 0 0 15px var(--blue-glow);
   z-index: 1001;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 
 .modern-timer-label {
