@@ -91,11 +91,10 @@ body {
   align-items: center;
   background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
   border: 2px solid var(--neon-blue);
-  box-shadow: var(--neon-shadow);
-  border-radius: 12px;
-  height: 80px;
-  width: 56px;
-  margin: 0 3px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  height: clamp(60px, 12vh, 100px);
+  width: clamp(42px, 7vw, 70px);
+  margin: 0 clamp(2px, 0.5vw, 3px);
   box-shadow: 
     0 0 20px var(--card-glow),
     0 4px 8px rgba(0, 0, 0, 0.3);

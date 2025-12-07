@@ -122,7 +122,8 @@ const Player = (props) => {
           <img 
             className={`player-avatar--image${(isActive ? ' activePlayer' : '')}`} 
             src={avatarURL} 
-            alt="Player Avatar" 
+            alt={`${name} avatar`}
+            loading="lazy"
           />
           <h5 className="player-info--name" style={{'fontSize': (name.length < 14) ? 12 : 10}}>
             {`${name}`}

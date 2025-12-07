@@ -745,10 +745,19 @@ img {
 }
 
 .showdown--handrank {
-	width: 115px;
-	text-align: center;
-	color: #FDBA0A;
-	font-size: 13px;
+  width: auto;
+  min-width: clamp(100px, 15vw, 150px);
+  text-align: center;
+  color: #FFFFFF;
+  font-size: clamp(16px, 2.5vw, 20px);
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2vw, 16px);
+  background: rgba(0, 102, 255, 0.3);
+  border-radius: clamp(8px, 1.5vw, 12px);
+  border: 1px solid rgba(0, 255, 255, 0.5);
+  margin: clamp(8px, 1.5vh, 12px) auto;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
 }
 
 .message--earnings {

@@ -598,9 +598,10 @@ function GameTable() {
     );
   };
 
-  // Debug: Log state to console
+  // Debug: Log state to console (only in development)
   useEffect(() => {
-    console.log('GameTable State:', {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('GameTable State:', {
       loading,
       gameInitialized,
       players: players?.length || 0,

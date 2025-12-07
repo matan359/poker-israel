@@ -20,17 +20,18 @@ const ShowdownPlayer = (props) => {
         <img 
             className="player-avatar--image" 
             src={avatarURL}  
-            alt="Player Avatar"
+            alt={`${name} avatar`}
+            loading="lazy"
         />
         <h5 className="player-info--name">
             {`${name}`}
         </h5>
       </div>
-      <div class="showdownPlayer--privateCards">
-        <h5 class="showdownPlayer--cards--heading">
+      <div className="showdownPlayer--privateCards">
+        <h5 className="showdownPlayer--cards--heading">
           Private Cards
         </h5>
-        <div class="showdownPlayer--cards">
+        <div className="showdownPlayer--cards">
           { renderCards(cards) }
         </div>    
       </div>

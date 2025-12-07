@@ -20,7 +20,9 @@ const Card = (props) => {
     <div 
       key={`${suit} ${cardFace}`} 
       className={`playing-card cardIn ${(applyFoldedClassname ? ' folded' : '')} ${isRed ? 'red-suit' : 'black-suit'}`} 
-      style={{animationDelay: `${(applyFoldedClassname) ?  0 : animationDelay}ms`}}>
+      style={{animationDelay: `${(applyFoldedClassname) ?  0 : animationDelay}ms`}}
+      role="img"
+      aria-label={`${cardFace} of ${suit}`}>
       {/* Top corner - value and suit */}
       <div className="card-corner card-corner-top">
         <div className="card-value">{cardFace}</div>
