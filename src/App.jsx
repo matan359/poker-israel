@@ -656,13 +656,12 @@ function GameTable() {
       <div className="poker-table--wrapper">
       
       {/* Top Bar with Logo */}
-      <div className="game-top-bar">
+      <div className="game-top-bar compact">
         <div className="game-logo-container">
-          <PokerIsraelLogo size="medium" />
+          <PokerIsraelLogo size="small" />
         </div>
         <div className="table-info">
-          <div className="table-name">Table 1</div>
-          <div className="table-blinds">10/20</div>
+          <div className="table-name">Table 1 • Blinds 10/20</div>
         </div>
         {(() => {
           // Find the current player (Player 1) in the game
@@ -681,6 +680,12 @@ function GameTable() {
             </div>
           );
         })()}
+        {timerActive && (
+          <div className={`modern-timer ${turnTimeRemaining <= 10 ? 'warning' : ''}`}>
+            <div className="modern-timer-label">Time Remaining</div>
+            <div className="modern-timer-value">{turnTimeRemaining}s</div>
+          </div>
+        )}
         <button 
           className="game-back-btn" 
           onClick={() => window.location.href = '/'}
@@ -689,7 +694,7 @@ function GameTable() {
         </button>
       </div>
       
-      <div className="modern-table-container">
+      <div className="modern-table-container compact">
         <div className="poker-table--container">
           <img
             className="poker-table--table-image"
@@ -748,13 +753,6 @@ function GameTable() {
       </div>
 
       {phase === 'showdown' && renderShowdown()}
-
-      {timerActive && (
-        <div className={`modern-timer ${turnTimeRemaining <= 10 ? 'warning' : ''}`}>
-          <div className="modern-timer-label">Time Remaining</div>
-          <div className="modern-timer-value">{turnTimeRemaining}s</div>
-        </div>
-      )}
 
       <div className="modern-action-bar">
         <div className="action-buttons">{renderActionButtons()}</div>
