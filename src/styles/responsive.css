@@ -1,0 +1,163 @@
+/* src/styles/responsive.css */
+
+/* Remove the landscape-only hack */
+@media (max-width: 552px) {
+  .poker-table--container {
+    transform: none !important; /* Override the rotate(90deg) */
+  }
+}
+
+/* Base styles for mobile */
+.poker-table--container {
+  width: 100%;
+  max-width: 95vw;
+  margin: 0 auto;
+  position: relative;
+}
+
+.poker-table--table-image {
+  width: 100%;
+  height: auto;
+}
+
+/* Player positioning for mobile */
+.p0, .p1, .p2, .p3, .p4 {
+  position: absolute;
+  width: clamp(75px, 20vw, 120px);
+  z-index: 15;
+}
+
+.p0 { /* Bottom center */
+  bottom: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.p1 { /* Bottom left */
+  bottom: 10%;
+  left: 5%;
+}
+
+.p2 { /* Top left */
+  top: 10%;
+  left: 5%;
+}
+
+.p3 { /* Top right */
+  top: 10%;
+  right: 5%;
+}
+
+.p4 { /* Bottom right */
+  bottom: 10%;
+  right: 5%;
+}
+
+.community-card-container {
+  top: 38%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  gap: 5px;
+}
+
+.pot-container {
+  top: 25%;
+  font-size: 14px;
+}
+
+.dealer-container {
+  top: 5%;
+}
+
+/* Tablet styles */
+@media (min-width: 768px) {
+  .poker-table--container {
+    max-width: 80vw;
+  }
+
+  .p0 {
+    bottom: 5%;
+  }
+
+  .p1 {
+    bottom: 15%;
+    left: 10%;
+  }
+
+  .p2 {
+    top: 20%;
+    left: 10%;
+  }
+
+  .p3 {
+    top: 20%;
+    right: 10%;
+  }
+
+  .p4 {
+    bottom: 15%;
+    right: 10%;
+  }
+
+  .community-card-container {
+    width: 60%;
+    gap: 10px;
+  }
+
+  .pot-container {
+    top: 30%;
+    font-size: 16px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1080px) {
+  .poker-table--container {
+    width: 1080px;
+    height: 590px;
+    max-width: 90vw;
+    max-height: 60vh;
+  }
+
+  .p0 {
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .p1 {
+    bottom: 5%;
+    left: 20%;
+  }
+  .p2 {
+    top: 25%;
+    left: 8%;
+  }
+ 
+  .p4 {
+    bottom: 5%;
+    right: 20%;
+  }
+  .p3 {
+    top: 25%;
+    right: 8%;
+  }
+
+  .community-card-container {
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    min-width: fit-content;
+    height: 120px;
+    gap: 12px;
+    z-index: 18;
+  }
+
+  .pot-container {
+    top: 38%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+  }
+}

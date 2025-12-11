@@ -1041,3 +1041,28 @@
   }
 }
 
+@media (max-width: 320px) {
+  .tables-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-card {
+    padding: 10px;
+  }
+
+  .lobby-header {
+    padding: 10px;
+  }
+
+  .lobby-header h2 {
+    font-size: 20px;
+  }
+
+  .lobby-header p {
+    font-size: 11px;
+  }
+
+  .lobby-menu-bar {
+    padding: 5px 10px;
+  }
+}

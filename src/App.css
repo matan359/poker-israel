@@ -29,3 +29,82 @@ h1, h2, h3, h4, h5, h6 {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.modern-poker-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('/public/assets/poker-table-background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -999;
+  pointer-events: none;
+}
+
+.poker-table--wrapper {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #FFFFFF;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  z-index: 100;
+}
+
+.modern-table-container {
+  position: relative;
+  z-index: 10;
+  padding-top: 10px;
+  padding-bottom: 150px;
+}
+
+.poker-table--container {
+  position: relative;
+  z-index: 10;
+  margin: 0 auto;
+}
+
+.modern-pot-icon {
+  height: 55px;
+  width: 55px;
+}
+
+.loading-players-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #FFFFFF;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  text-align: center;
+  z-index: 100;
+}
+
+.loading-players-text {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.bonus-button-mobile {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  z-index: 1001;
+}
+
+.showdown-player--besthand--cards {
+  align-items: center;
+}

@@ -35,6 +35,7 @@ import './Poker.css';
 import './styles/ModernPoker.css';
 import './styles/WaitingPlayer.css';
 import './styles/ScrollOptimization.css';
+import './styles/responsive.css';
 
 function GameTable() {
   const [showAuth, setShowAuth] = useState(false);
@@ -558,7 +559,7 @@ function GameTable() {
         />
         <div className="showdown-player--besthand--container">
           <h5 className="showdown-player--besthand--heading">Best Hand</h5>
-          <div className="showdown-player--besthand--cards" style={{ alignItems: 'center' }}>
+          <div className="showdown-player--besthand--cards">
             {player.bestHand?.map((card, index) => {
               const cardData = { ...card, animationDelay: 0 };
               return <Card key={index} cardData={cardData} />;
@@ -613,49 +614,23 @@ function GameTable() {
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       console.log('GameTable State:', {
-      loading,
-      gameInitialized,
-      players: players?.length || 0,
-      activePlayerIndex,
-      phase,
-      winnerFound
-    });
+        loading,
+        gameInitialized,
+        players: players?.length || 0,
+        activePlayerIndex,
+        phase,
+        winnerFound,
+      });
+    }
   }, [loading, gameInitialized, players, activePlayerIndex, phase, winnerFound]);
 
   // Show loading only if we don't have players yet
   if (!players || (loading && !gameInitialized)) {
     return (
       <>
-        <div 
-          className="modern-poker-background"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundImage: 'url(/assets/poker-table-background.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
-            zIndex: -999,
-            pointerEvents: 'none'
-          }}
-        />
-        <div className="poker-table--wrapper" style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '100vh',
-            color: '#FFFFFF',
-            textShadow: '0 0 10px rgba(0, 255, 255, 0.8)',
-            flexDirection: 'column',
-            gap: '20px',
-            position: 'relative',
-            zIndex: 100
-          }}>
+        <div className="modern-poker-background" />
+        <div className="poker-table--wrapper">
+          <div className="loading-spinner-container">
             <Spinner />
             <div>Loading game...</div>
           </div>
@@ -667,24 +642,8 @@ function GameTable() {
   if (winnerFound) {
     return (
       <>
-        <div 
-          className="modern-poker-background"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundImage: 'url(/assets/poker-table-background.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
-            zIndex: -999,
-            pointerEvents: 'none'
-          }}
-        />
-        <div className="poker-table--wrapper" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="modern-poker-background" />
+        <div className="poker-table--wrapper">
           <WinScreen />
         </div>
       </>
@@ -693,24 +652,8 @@ function GameTable() {
 
   return (
     <>
-      <div 
-        className="modern-poker-background"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundImage: 'url(/assets/poker-table-background.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
-          zIndex: -999,
-          pointerEvents: 'none'
-        }}
-      />
-      <div className="poker-table--wrapper" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 1 }}>
+      <div className="modern-poker-background" />
+      <div className="poker-table--wrapper">
       
       {/* Top Bar with Logo */}
       <div className="game-top-bar">
@@ -742,8 +685,8 @@ function GameTable() {
         </button>
       </div>
       
-      <div className="modern-table-container" style={{ position: 'relative', zIndex: 10, paddingTop: '10px', paddingBottom: '150px' }}>
-        <div className="poker-table--container" style={{ position: 'relative', zIndex: 10, margin: '0 auto' }}>
+      <div className="modern-table-container">
+        <div className="poker-table--container">
           <img
             className="poker-table--table-image"
             src="/assets/table-nobg-svg-01.svg"
@@ -773,17 +716,8 @@ function GameTable() {
           />
           
           {players && players.length > 0 ? renderBoard() : (
-            <div style={{ 
-              position: 'absolute', 
-              top: '50%', 
-              left: '50%', 
-              transform: 'translate(-50%, -50%)',
-              color: '#FFFFFF',
-            textShadow: '0 0 10px rgba(0, 255, 255, 0.8)',
-              textAlign: 'center',
-              zIndex: 100
-            }}>
-              <div style={{ fontSize: '24px', marginBottom: '10px' }}>Loading players...</div>
+            <div className="loading-players-container">
+              <div className="loading-players-text">Loading players...</div>
             </div>
           )}
           
@@ -794,7 +728,6 @@ function GameTable() {
           <div className="pot-container modern-pot-container">
             <img
               className="modern-pot-icon"
-              style={{ height: 55, width: 55 }}
               src="/assets/pot.svg"
               alt={`Pot: ${pot || 0} chips`}
               loading="lazy"
@@ -838,7 +771,6 @@ function GameTable() {
         <button
           className="modern-action-button bonus-button-mobile"
           onClick={handleDailyBonus}
-          style={{ position: 'fixed', top: '80px', left: '20px', zIndex: 1001 }}
           aria-label="Claim daily bonus"
         >
           Claim Daily Bonus
@@ -848,7 +780,6 @@ function GameTable() {
       <button
         className="modern-action-button bonus-button-mobile"
         onClick={() => setShowBonusWheel(true)}
-        style={{ position: 'fixed', top: '80px', left: '200px', zIndex: 1001 }}
         aria-label="Spin bonus wheel"
       >
         Bonus Wheel
@@ -887,25 +818,9 @@ function App() {
   if (authLoading) {
     return (
       <>
-        <div 
-          className="modern-poker-background"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundImage: 'url(/assets/poker-table-background.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
-            zIndex: -999,
-            pointerEvents: 'none'
-          }}
-        />
-        <div className="poker-table--wrapper" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="modern-poker-background" />
+        <div className="poker-table--wrapper">
+          <div className="loading-spinner-container">
             <div className="modern-spinner" />
           </div>
         </div>
@@ -962,24 +877,8 @@ function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <>
-        <div 
-          className="modern-poker-background"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundImage: 'url(/assets/poker-table-background.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            /* Removed backgroundAttachment: 'fixed' - causes scroll lag */
-            zIndex: -999,
-            pointerEvents: 'none'
-          }}
-        />
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', position: 'relative', zIndex: 1 }}>
+        <div className="modern-poker-background" />
+        <div className="loading-spinner-container">
           <div className="modern-spinner" />
         </div>
       </>
