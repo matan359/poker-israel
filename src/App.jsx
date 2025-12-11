@@ -758,16 +758,23 @@ function GameTable() {
 
       <div className="modern-action-bar">
         <div className="action-buttons">{renderActionButtons()}</div>
-        <div className="slider-boi">
-          {!loading &&
-            renderActionMenu(
-              highBet,
-              players,
-              activePlayerIndex,
-              phase,
-              handleBetInputChange,
-              changeSliderInput
-            )}
+        <div className="slider-container">
+          <div className="slider-labels">
+            <span>MIN</span>
+            <span>Select your bet amount</span>
+            <span>MAX</span>
+          </div>
+          <div className="slider-boi">
+            {!loading &&
+              renderActionMenu(
+                highBet,
+                players,
+                activePlayerIndex,
+                phase,
+                handleBetInputChange,
+                changeSliderInput
+              )}
+          </div>
         </div>
       </div>
 
