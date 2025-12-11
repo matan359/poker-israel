@@ -627,33 +627,28 @@ function GameTable() {
   // Show loading only if we don't have players yet
   if (!players || (loading && !gameInitialized)) {
     return (
-      <>
+      <div className="game-layout">
         <div className="modern-poker-background" />
-        <div className="poker-table--wrapper">
-          <div className="loading-spinner-container">
+        <div className="loading-spinner-container">
             <Spinner />
             <div>Loading game...</div>
-          </div>
         </div>
-      </>
+      </div>
     );
   }
 
   if (winnerFound) {
     return (
-      <>
+      <div className="game-layout">
         <div className="modern-poker-background" />
-        <div className="poker-table--wrapper">
-          <WinScreen />
-        </div>
-      </>
+        <WinScreen />
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="game-layout">
       <div className="modern-poker-background" />
-      <div className="poker-table--wrapper">
       
       {/* Top Bar with Logo */}
       <div className="game-top-bar compact">
@@ -694,7 +689,7 @@ function GameTable() {
         </button>
       </div>
       
-      <div className="modern-table-container compact">
+      <div className="modern-table-container">
         <div className="poker-table--container">
           <img
             className="poker-table--table-image"
@@ -755,54 +750,54 @@ function GameTable() {
       {phase === 'showdown' && renderShowdown()}
 
       <div className="modern-action-bar">
-        <div className="action-buttons">{renderActionButtons()}</div>
-        <div className="slider-container">
-          <div className="slider-labels">
-            <span>MIN</span>
-            <span>Select your bet amount</span>
-            <span>MAX</span>
-          </div>
-          <div className="slider-boi">
-            {!loading &&
-              renderActionMenu(
-                highBet,
-                players,
-                activePlayerIndex,
-                phase,
-                handleBetInputChange,
-                changeSliderInput
-              )}
+        <div className="secondary-actions">
+          {dailyBonusAvailable && (
+            <button
+              className="modern-action-button secondary"
+              onClick={handleDailyBonus}
+              aria-label="Claim daily bonus"
+            >
+              Claim Daily Bonus
+            </button>
+          )}
+          <button
+            className="modern-action-button secondary"
+            onClick={() => setShowBonusWheel(true)}
+            aria-label="Spin bonus wheel"
+          >
+            Bonus Wheel
+          </button>
+        </div>
+        <div className="main-actions">
+          <div className="action-buttons">{renderActionButtons()}</div>
+          <div className="slider-container">
+            <div className="slider-labels">
+              <span>MIN</span>
+              <span>Select your bet amount</span>
+              <span>MAX</span>
+            </div>
+            <div className="slider-boi">
+              {!loading &&
+                renderActionMenu(
+                  highBet,
+                  players,
+                  activePlayerIndex,
+                  phase,
+                  handleBetInputChange,
+                  changeSliderInput
+                )}
+            </div>
           </div>
         </div>
+        <Chat socket={socket} roomId={roomId} isOpen={showChat} onToggle={() => setShowChat(!showChat)} />
       </div>
-
-      {dailyBonusAvailable && (
-        <button
-          className="modern-action-button bonus-button-mobile"
-          onClick={handleDailyBonus}
-          aria-label="Claim daily bonus"
-        >
-          Claim Daily Bonus
-        </button>
-      )}
-
-      <button
-        className="modern-action-button bonus-button-mobile"
-        onClick={() => setShowBonusWheel(true)}
-        aria-label="Spin bonus wheel"
-      >
-        Bonus Wheel
-      </button>
-
-      <Chat socket={socket} roomId={roomId} isOpen={showChat} onToggle={() => setShowChat(!showChat)} />
 
       <Store isOpen={showStore} onClose={() => setShowStore(false)} />
 
       <BonusWheel isOpen={showBonusWheel} onClose={() => setShowBonusWheel(false)} />
 
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
-      </div>
-    </>
+    </div>
   );
 }
 
@@ -826,14 +821,12 @@ function App() {
 
   if (authLoading) {
     return (
-      <>
+      <div className="game-layout">
         <div className="modern-poker-background" />
-        <div className="poker-table--wrapper">
-          <div className="loading-spinner-container">
+        <div className="loading-spinner-container">
             <div className="modern-spinner" />
-          </div>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -885,12 +878,12 @@ function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <>
+      <div className="game-layout">
         <div className="modern-poker-background" />
         <div className="loading-spinner-container">
           <div className="modern-spinner" />
         </div>
-      </>
+      </div>
     );
   }
 

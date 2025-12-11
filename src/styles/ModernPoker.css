@@ -40,6 +40,14 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.game-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
 /* Modern Poker Table Background */
 .modern-poker-background {
   position: fixed;
@@ -283,35 +291,34 @@ body {
 
 /* Modern Action Buttons */
 .modern-action-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   background: rgba(0, 10, 20, 0.25);
   border-top: 1px solid rgba(0, 255, 255, 0.5);
   box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
   padding: clamp(12px, 2vw, 15px) clamp(15px, 3vw, 20px);
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: clamp(10px, 2vw, 20px);
   z-index: 1000;
   height: auto;
   min-height: clamp(70px, 12vh, 80px);
-  max-height: clamp(140px, 25vh, 160px);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   will-change: transform;
   transform: translateZ(0);
   contain: layout style paint;
   border-radius: 20px 20px 0 0;
 }
 
-.action-buttons {
+.main-actions {
   display: flex;
   gap: 10px;
-  width: 100%;
+}
+
+.secondary-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .slider-container {
@@ -349,6 +356,11 @@ body {
   overflow: hidden;
   white-space: nowrap;
   min-width: fit-content;
+}
+
+.modern-action-button.secondary {
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--darker-blue) 100%);
+  border-color: var(--primary-blue);
 }
 
 .modern-action-button::before {
@@ -389,10 +401,10 @@ body {
   background: linear-gradient(135deg, rgba(0, 17, 34, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
   border: 2px solid var(--primary-blue);
   border-radius: 12px;
-  padding: 10px 18px;
+  padding: 5px 10px;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 5px;
   box-shadow: 0 0 15px var(--blue-glow);
   z-index: 1001;
   backdrop-filter: blur(10px);
@@ -405,14 +417,13 @@ body {
 .modern-timer-label {
   color: #ccc;
   font-size: 10px;
-  margin-bottom: 3px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .modern-timer-value {
   color: var(--neon-white);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
   text-shadow: 0 0 8px var(--cyan-glow);
 }
@@ -430,11 +441,6 @@ body {
 
 /* Game Top Bar - Professional Design with Centered Logo */
 .game-top-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50px;
   background: linear-gradient(135deg, rgba(0, 17, 34, 0.98) 0%, rgba(0, 51, 102, 0.98) 100%);
   border-bottom: 2px solid rgba(0, 255, 255, 0.6);
   box-shadow: 
@@ -640,19 +646,12 @@ body {
 
 /* Modern Table */
 .modern-table-container {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 90px);
-  margin-top: 50px;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-}
-
-.modern-table-container.compact {
-  height: calc(100vh - 40px - 140px);
-  margin-top: 40px;
+  position: relative;
 }
 
 .modern-table-image {
@@ -733,7 +732,7 @@ body {
     gap: clamp(8px, 1.5vw, 10px);
   }
 
-  .action-buttons {
+  .main-actions {
     flex-direction: column;
     width: 100%;
   }
