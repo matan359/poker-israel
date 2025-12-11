@@ -660,6 +660,10 @@ function GameTable() {
         <div className="game-logo-container">
           <PokerIsraelLogo size="medium" />
         </div>
+        <div className="table-info">
+          <div className="table-name">Table 1</div>
+          <div className="table-blinds">10/20</div>
+        </div>
         {(() => {
           // Find the current player (Player 1) in the game
           const currentPlayer = players && players.length > 0 

@@ -109,6 +109,15 @@
     top: 30%;
     font-size: 16px;
   }
+
+  .game-top-bar {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .modern-action-bar {
+    flex-direction: row;
+  }
 }
 
 /* Desktop styles */
