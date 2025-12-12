@@ -5,6 +5,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import useGameStore from '../../store/gameStore';
 import useAuthStore from '../../store/authStore';
@@ -466,6 +467,9 @@ const Lobby = ({ onJoinTable, onCreateTable }) => {
         <div className="lobby-menu-right">
           {userProfile ? (
             <>
+              <Link to="/casino" className="lobby-menu-btn" style={{ textDecoration: 'none' }}>
+                🎰 קזינו
+              </Link>
               <button className="lobby-menu-btn" onClick={() => setShowStore(true)}>
                 🛒 חנות
               </button>

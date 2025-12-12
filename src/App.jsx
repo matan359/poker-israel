@@ -23,6 +23,7 @@ import Spinner from './Spinner';
 import WinScreen from './WinScreen';
 import ErrorBoundary from './components/ErrorBoundary';
 import Store from './components/store/Store';
+import CasinoWrapper from './components/casino/CasinoWrapper';
 
 // Utils
 import { renderShowdownMessages, renderActionButtonText, renderNetPlayerEarnings, renderActionMenu } from './utils/ui';
@@ -856,6 +857,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <StoreWrapper />
+              </ProtectedRoute>
+            }
+          />
+          {/* Casino Routes */}
+          <Route
+            path="/casino/*"
+            element={
+              <ProtectedRoute>
+                <CasinoWrapper />
               </ProtectedRoute>
             }
           />
