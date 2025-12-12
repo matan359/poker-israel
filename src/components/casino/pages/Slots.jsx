@@ -9,24 +9,46 @@ import { GoArrowSwitch } from "react-icons/go";
 import Ripples from 'react-ripples'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import io from 'socket.io-client'; // Import the Socket.io client library
+import io from 'socket.io-client';
 import axios from 'axios';
 import { Card, Skeleton, Button, Checkbox } from '@nextui-org/react';
 import * as CryptoJS from 'crypto-js';
+
+// Helper functions - moved before component
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function roundedToFixed(number, decimals){
+  number = Number((parseFloat(number).toFixed(5)));
+  var number_string = number.toString();
+  var decimals_string = 0;
+  if(number_string.split('.')[1] !== undefined) decimals_string = number_string.split('.')[1].length;
+  while(decimals_string - decimals > 0) {
+    number_string = number_string.slice(0, -1);
+    decimals_string --;
+  }
+  return Number(number_string);
+}
 
 const Slots = () => {
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState('');
   const [balance, setBalance] = useState(0.00);
   const [level, setLevel] = useState('');
-  const nrRoll_1 = getRandomInt(0, 9);
-  const nrRoll_2 = getRandomInt(0, 9);
-  const nrRoll_3 = getRandomInt(0, 9);
-  const nrRoll_4 = getRandomInt(0, 9);
   const [currentRoll, setCurrentRoll] = useState(null);
   const [DiceResult, SetDiceResult] = useState(null);
-
-  const rollDice = roundedToFixed(parseFloat((nrRoll_1 * 1000 + nrRoll_2 * 100 + nrRoll_3 * 10 + nrRoll_4) / 100), 2);
+  
+  // Initialize random numbers
+  const [rollNumbers, setRollNumbers] = useState(() => {
+    const nrRoll_1 = getRandomInt(0, 9);
+    const nrRoll_2 = getRandomInt(0, 9);
+    const nrRoll_3 = getRandomInt(0, 9);
+    const nrRoll_4 = getRandomInt(0, 9);
+    return { nrRoll_1, nrRoll_2, nrRoll_3, nrRoll_4 };
+  });
+  
+  const rollDice = roundedToFixed(parseFloat((rollNumbers.nrRoll_1 * 1000 + rollNumbers.nrRoll_2 * 100 + rollNumbers.nrRoll_3 * 10 + rollNumbers.nrRoll_4) / 100), 2);
 
   const [rangeData, setRangeData] = useState(50);
   const [inputColor, setInputColor] = useState(false);
@@ -35,7 +57,13 @@ const Slots = () => {
    
   useEffect(() => {
     // Initialize socket connection
-    const socket = io('http://localhost:3001');
+    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
+    const socket = io(socketUrl, {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
   
     // Set the socket state
     setSocket(socket);
@@ -49,17 +77,25 @@ const Slots = () => {
       
       try {
         // Emit 'getUserData' event to request user data from the server
-        socket.emit('getUserData'); // en onemlisi
-  
+        socket.emit('getUserData');
+
         // Use a Promise to wait for the 'userData' event from the server
-        const userData = await new Promise((resolve) => {
+        const userData = await new Promise((resolve, reject) => {
+          // Set timeout to prevent hanging
+          const timeout = setTimeout(() => {
+            reject(new Error('Timeout waiting for user data'));
+          }, 5000);
+          
           // Listen for 'userData' event from the server
-          socket.on('userData', (data) => resolve(data));
+          socket.once('userData', (data) => {
+            clearTimeout(timeout);
+            resolve(data);
+          });
         });
-  
+
         // Check if the component is still mounted
         if (isMounted) {
-          if (userData.success) {
+          if (userData && userData.success) {
             const {
               id,
               username,
@@ -77,18 +113,37 @@ const Slots = () => {
               level,
               xp
             } = userData.userData;
-  
+
             // Update state variables accordingly
-            setUsername(username);
-            setBalance(balance);
-            setLevel(level);
+            setUsername(username || 'Guest');
+            setBalance(balance || 0.00);
+            setLevel(level || '1');
           } else {
-            // Handle error
-            console.error("Failed to fetch user data");
+            // Handle error - use default values
+            console.warn("Failed to fetch user data, using defaults");
+            setUsername('Guest');
+            setBalance(0.00);
+            setLevel('1');
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.warn("Error fetching user data, using defaults:", error);
+        // Use default values if connection fails
+        if (isMounted) {
+          setUsername('Guest');
+          setBalance(0.00);
+          setLevel('1');
+        }
+      }
+    });
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+      console.warn('Socket connection error, using defaults:', error);
+      if (isMounted) {
+        setUsername('Guest');
+        setBalance(0.00);
+        setLevel('1');
       }
     });
   
@@ -97,40 +152,24 @@ const Slots = () => {
       isMounted = false;
       socket.disconnect();
     };
-  }, []);  
-  function roundedToFixed(number, decimals){
-    number = Number((parseFloat(number).toFixed(5)));
-    
-    var number_string = number.toString();
-    var decimals_string = 0;
-    
-    if(number_string.split('.')[1] !== undefined) decimals_string = number_string.split('.')[1].length;
-    
-    while(decimals_string - decimals > 0) {
-      number_string = number_string.slice(0, -1);
-      
-      decimals_string --;
-    }
-    
-    return Number(number_string);
-  }
-  
-  
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  }, []);
 
 const fetchUserData = async () => {
   try {
    const token = localStorage.getItem("token");
-     const response = await axios.get("http://localhost:3001/getUserData", {
+     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+     const response = await axios.get(`${apiUrl}/getUserData`, {
        headers: {
          Authorization: `Bearer ${token}`,
        },
+       timeout: 5000,
+     }).catch(() => {
+       // Return default data if API fails
+       return { data: { success: false } };
      });
 
-     if (response.data.success) {
-       const userData = response.data; // Assuming response.data contains all the fields
+     if (response.data && response.data.success) {
+       const userData = response.data;
 
        // Set state variables using destructuring
        const {
@@ -152,15 +191,18 @@ const fetchUserData = async () => {
        } = userData;
 
        // Now set your state variables accordingly
-       setUsername(username);
-       //setBalance(balance);
-       setLevel(level);
+       setUsername(username || 'Guest');
+       setLevel(level || '1');
      } else {
        // Handle error
-       console.error("Failed to fetch user data");
+       console.warn("Failed to fetch user data, using defaults");
+       setUsername('Guest');
+       setLevel('1');
      }
    } catch (error) {
-     console.error("Error fetching user data:", error);
+     console.warn("Error fetching user data, using defaults:", error);
+     setUsername('Guest');
+     setLevel('1');
    }
  };
   
@@ -179,7 +221,7 @@ const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token");
   
-  
+
       function sha256(s) {
         return CryptoJS.SHA256(s).toString(CryptoJS.enc.Hex);
       }
@@ -219,35 +261,37 @@ const fetchUserData = async () => {
       console.log('Roll Dice:', rollDice);
       console.log('Multiplier:', multiplier);
       console.log('Bet Amount:', betAmount);
-  
+
       // Check if the player wins based on the rollDice value and rangeData
       const playerWins = diceresult < rangeData;
       const playerLost = diceresult > rangeData;
-  
+
       if (playerWins) {
         const totalamount = betAmount * multiplier / 2;
-        const winamount = totalamount; // Convert to integer
+        const winamount = totalamount;
         console.log('winamount Balance (Win):', winamount);
-        setBalance(winamount);
-        socket.emit('winbet', { winamount, username });
-
+        setBalance(prev => prev + winamount);
+        if (socket && socket.connected) {
+          socket.emit('winbet', { winamount, username });
+        }
         toast.success(`Place Bet successful! You won ${(betAmount * multiplier)} coins.`);
       } else if (playerLost) {
         const loseamountt = betAmount;
-        const loseamount = (- betAmount); // Convert to integer
+        const loseamount = (- betAmount);
         console.log('Updated Balance (Loss):', loseamount);
-        setBalance(loseamount);
+        setBalance(prev => prev - betAmount);
+        if (socket && socket.connected) {
+          socket.emit('losebet', { loseamount, username });
+        }
         toast.error(`Place Bet successful! You Lost ${(betAmount)} coins.`);
-        socket.emit('losebet', { loseamount, username });
-
       }
   
       // Emit 'getUserData' event to request updated user data from the server
       // socket.emit('getUserData');
     } catch (error) {
-      console.error('Error placing bet:', error.message);
+      console.error('Error placing bet:', error);
       // Handle the error, possibly show an error toast to the user
-      toast.error('Error placing bet');
+      toast.error('Error placing bet. Please try again.');
     }
   };
       
@@ -262,10 +306,10 @@ const fetchUserData = async () => {
 
             <iframe
         src="https://api-prod.mortalsoft.online/play/SweetBonanza/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMyIsImVtYWlsIjoiM18yNzNAYmFyLmNvbSIsImlkIjo2OTd9.kkFRYpXhSF-AceZgVrikpqOXkXNCWgqaMdn2h8ktHKQ"
-        class="w-full h-full"
-        frameborder="0"
+        className="w-full h-full"
+        frameBorder="0"
         title="Game iframe"
-        allowfullscreen
+        allowFullScreen
       ></iframe>
 
 </div>
@@ -344,9 +388,9 @@ const fetchUserData = async () => {
         pauseOnHover
         theme="white"
         style={{
-          fontSize: '14px', // Adjust the font size
-          padding: '10px', // Adjust the padding
-          maxWidth: '100%', // Ensure the container is responsive
+          fontSize: '14px',
+          padding: '10px',
+          maxWidth: '100%',
         }}
       />
     </div>

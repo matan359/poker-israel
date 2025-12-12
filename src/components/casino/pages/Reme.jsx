@@ -9,178 +9,38 @@ import { GoArrowSwitch } from "react-icons/go";
 import Ripples from 'react-ripples'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import io from 'socket.io-client'; // Import the Socket.io client library
+import io from 'socket.io-client';
 import axios from 'axios';
 import { Card, Skeleton, Button, Checkbox } from '@nextui-org/react';
 import * as CryptoJS from 'crypto-js';
-const Limbo = () => {
-  const [socket, setSocket] = useState(null);
-  const [username, setUsername] = useState('');
-  const [balance, setBalance] = useState(0.00);
-  const [level, setLevel] = useState('');
-  const nrRoll_1 = getRandomInt(0, 9);
-  const nrRoll_2 = getRandomInt(0, 9);
-  const nrRoll_3 = getRandomInt(0, 9);
-  const nrRoll_4 = getRandomInt(0, 9);
-  const [currentRoll, setCurrentRoll] = useState(null);
-  const [playerpoint, setPlayer] = useState(null);
-  const [housepoint, setHouse] = useState(null);
-  
 
-  const [rangeData, setRangeData] = useState(50);
-  const [inputColor, setInputColor] = useState(false);
-  let inputRef = useRef();
-  const [betAmount, setBetAmount] = useState(1);
-  const [MultiplierAmount, setMultiplierAmount] = useState(1);
+// Helper functions - moved before component
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  useEffect(() => {
-    // Initialize socket connection
-    const socket = io('http://localhost:3001');
-  
-    // Set the socket state
-    setSocket(socket);
-  
-    // Variable to track if the component is mounted
-    let isMounted = true;
-  
-    // Listen for 'connect' event to check if the connection is successful
-    socket.on('connect', async () => {
-      console.log('Socket connected');
-      
-      try {
-        // Emit 'getUserData' event to request user data from the server
-        socket.emit('getUserData'); // en onemlisi
-  
-        // Use a Promise to wait for the 'userData' event from the server
-        const userData = await new Promise((resolve) => {
-          // Listen for 'userData' event from the server
-          socket.on('userData', (data) => resolve(data));
-        });
-  
-        // Check if the component is still mounted
-        if (isMounted) {
-          if (userData.success) {
-            const {
-              id,
-              username,
-              email,
-              balance,
-              total_bets,
-              games_won,
-              total_wagered,
-              net_profit,
-              all_time_high,
-              all_time_low,
-              total_deposited,
-              total_withdrawn,
-              join_date,
-              level,
-              xp
-            } = userData.userData;
-  
-            // Update state variables accordingly
-            setUsername(username);
-            setBalance(balance);
-            setLevel(level);
-          } else {
-            // Handle error
-            console.error("Failed to fetch user data");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    });
-  
-    // Clean up the event listener when the component unmounts
-    return () => {
-      isMounted = false;
-      socket.disconnect();
-    };
-  }, []);  
-  function roundedToFixed(number, decimals){
-    number = Number((parseFloat(number).toFixed(5)));
-    
-    var number_string = number.toString();
-    var decimals_string = 0;
-    
-    if(number_string.split('.')[1] !== undefined) decimals_string = number_string.split('.')[1].length;
-    
-    while(decimals_string - decimals > 0) {
-      number_string = number_string.slice(0, -1);
-      
-      decimals_string --;
-    }
-    
-    return Number(number_string);
+function roundedToFixed(number, decimals){
+  number = Number((parseFloat(number).toFixed(5)));
+  var number_string = number.toString();
+  var decimals_string = 0;
+  if(number_string.split('.')[1] !== undefined) decimals_string = number_string.split('.')[1].length;
+  while(decimals_string - decimals > 0) {
+    number_string = number_string.slice(0, -1);
+    decimals_string --;
   }
-  
+  return Number(number_string);
+}
 
-  const HOUSE_EDGE = 4; // Limbo game has a 4% house edge
-  const MAX_MULTIPLIER = 1000.00; // Limbo game has a 1000.00x max multiplier
-    
-  function generateRandomString(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
+function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  
-  
-  //console.log(`Generated Game Seed: ${generatedGameSeed}`);
-  //console.log(`Crash Point: ${crashPoint}x`);
-    
+  return result;
+}
 
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-const fetchUserData = async () => {
-  try {
-   const token = localStorage.getItem("token");
-     const response = await axios.get("http://localhost:3001/getUserData", {
-       headers: {
-         Authorization: `Bearer ${token}`,
-       },
-     });
-
-     if (response.data.success) {
-       const userData = response.data; // Assuming response.data contains all the fields
-
-       // Set state variables using destructuring
-       const {
-         id,
-         username,
-         email,
-         balance,
-         total_bets,
-         games_won,
-         total_wagered,
-         net_profit,
-         all_time_high,
-         all_time_low,
-         total_deposited,
-         total_withdrawn,
-         join_date,
-         level,
-         xp
-       } = userData;
-
-       // Now set your state variables accordingly
-       setUsername(username);
-       //setBalance(balance);
-       setLevel(level);
-     } else {
-       // Handle error
-       console.error("Failed to fetch user data");
-     }
-   } catch (error) {
-     console.error("Error fetching user data:", error);
-   }
- };
- function sha256(s) {
+function sha256(s) {
   return CryptoJS.SHA256(s).toString(CryptoJS.enc.Hex);
 }
 
@@ -207,12 +67,181 @@ function createRandom(seed) {
 function getRouletteNumbers(gameHash) {
   const seed = getNumberFromHash(gameHash);
   const random = createRandom(seed);
-
   const numbers = {};
   numbers.player = Math.abs(random() % (36 + 1));
   numbers.house = Math.abs(random() % (36 + 1));
   return numbers;
 }
+
+const HOUSE_EDGE = 4;
+const MAX_MULTIPLIER = 1000.00;
+
+const Reme = () => {
+  const [socket, setSocket] = useState(null);
+  const [username, setUsername] = useState('');
+  const [balance, setBalance] = useState(0.00);
+  const [level, setLevel] = useState('');
+  const [currentRoll, setCurrentRoll] = useState(null);
+  const [playerpoint, setPlayer] = useState(null);
+  const [housepoint, setHouse] = useState(null);
+  
+
+  const [rangeData, setRangeData] = useState(50);
+  const [inputColor, setInputColor] = useState(false);
+  let inputRef = useRef();
+  const [betAmount, setBetAmount] = useState(1);
+  const [MultiplierAmount, setMultiplierAmount] = useState(1);
+
+  useEffect(() => {
+    // Initialize socket connection
+    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
+    const socket = io(socketUrl, {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
+  
+    // Set the socket state
+    setSocket(socket);
+  
+    // Variable to track if the component is mounted
+    let isMounted = true;
+  
+    // Listen for 'connect' event to check if the connection is successful
+    socket.on('connect', async () => {
+      console.log('Socket connected');
+      
+      try {
+        // Emit 'getUserData' event to request user data from the server
+        socket.emit('getUserData');
+  
+        // Use a Promise to wait for the 'userData' event from the server
+        const userData = await new Promise((resolve, reject) => {
+          // Set timeout to prevent hanging
+          const timeout = setTimeout(() => {
+            reject(new Error('Timeout waiting for user data'));
+          }, 5000);
+          
+          // Listen for 'userData' event from the server
+          socket.once('userData', (data) => {
+            clearTimeout(timeout);
+            resolve(data);
+          });
+        });
+  
+        // Check if the component is still mounted
+        if (isMounted) {
+          if (userData && userData.success) {
+            const {
+              id,
+              username,
+              email,
+              balance,
+              total_bets,
+              games_won,
+              total_wagered,
+              net_profit,
+              all_time_high,
+              all_time_low,
+              total_deposited,
+              total_withdrawn,
+              join_date,
+              level,
+              xp
+            } = userData.userData;
+  
+            // Update state variables accordingly
+            setUsername(username || 'Guest');
+            setBalance(balance || 0.00);
+            setLevel(level || '1');
+          } else {
+            // Handle error - use default values
+            console.warn("Failed to fetch user data, using defaults");
+            setUsername('Guest');
+            setBalance(0.00);
+            setLevel('1');
+          }
+        }
+      } catch (error) {
+        console.warn("Error fetching user data, using defaults:", error);
+        // Use default values if connection fails
+        if (isMounted) {
+          setUsername('Guest');
+          setBalance(0.00);
+          setLevel('1');
+        }
+      }
+    });
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+      console.warn('Socket connection error, using defaults:', error);
+      if (isMounted) {
+        setUsername('Guest');
+        setBalance(0.00);
+        setLevel('1');
+      }
+    });
+  
+    // Clean up the event listener when the component unmounts
+    return () => {
+      isMounted = false;
+      socket.disconnect();
+    };
+  }, []);
+
+const fetchUserData = async () => {
+  try {
+   const token = localStorage.getItem("token");
+     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+     const response = await axios.get(`${apiUrl}/getUserData`, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+       },
+       timeout: 5000,
+     }).catch(() => {
+       // Return default data if API fails
+       return { data: { success: false } };
+     });
+
+     if (response.data && response.data.success) {
+       const userData = response.data;
+
+       // Set state variables using destructuring
+       const {
+         id,
+         username,
+         email,
+         balance,
+         total_bets,
+         games_won,
+         total_wagered,
+         net_profit,
+         all_time_high,
+         all_time_low,
+         total_deposited,
+         total_withdrawn,
+         join_date,
+         level,
+         xp
+       } = userData;
+
+       // Now set your state variables accordingly
+       setUsername(username || 'Guest');
+       setLevel(level || '1');
+     } else {
+       // Handle error
+       console.warn("Failed to fetch user data, using defaults");
+       setUsername('Guest');
+       setLevel('1');
+     }
+   } catch (error) {
+     console.warn("Error fetching user data, using defaults:", error);
+     setUsername('Guest');
+     setLevel('1');
+   }
+ };
 
    // fetchUserData();
    function generateRandomGame() {
@@ -295,25 +324,31 @@ function getRouletteNumbers(gameHash) {
   
         console.log('Win Amount (Win):', winamount);
         toast.success(`Place Bet successful! You won ${winamount} coins player win!.`);
-        setBalance(winamount);
-        socket.emit('winbet', { winamount, username });
+        setBalance(prev => prev + winamount);
+        if (socket && socket.connected) {
+          socket.emit('winbet', { winamount, username });
+        }
       } else if (playerLoses) {
         const loseamount = -betAmount;
         console.log('Updated Balance (Loss):', loseamount);
-        setBalance(loseamount);
+        setBalance(prev => prev - betAmount);
+        if (socket && socket.connected) {
+          socket.emit('losebet', { loseamount, username });
+        }
         toast.error(` You Lost ${betAmount} coins house win!.`);
-        socket.emit('losebet', { loseamount, username });
       } else if (playersame) {
         const loseamount = -betAmount;
         console.log('Updated Balance (Loss):', loseamount);
-        setBalance(loseamount);
+        setBalance(prev => prev - betAmount);
+        if (socket && socket.connected) {
+          socket.emit('losebet', { loseamount, username });
+        }
         toast.warning(` You Tie ${betAmount} coins house win!.`);
-        socket.emit('losebet', { loseamount, username });
 
       }
     } catch (error) {
-      console.error('Error placing bet:', error.message);
-      toast.error('Error placing bet');
+      console.error('Error placing bet:', error);
+      toast.error('Error placing bet. Please try again.');
     }
   };
   
@@ -416,7 +451,7 @@ function getRouletteNumbers(gameHash) {
         <div className="pt-24 xl:ml-[80px]">
           <div className="xl:w-[68%] lg:w-[80%]  w-[90%] xl:ml-[450px] lg:ml-[420px] mx-auto lg:mt-0 mt-6 lg:h-[300px] h-[600px] bg-[#1C1D27] rounded-md px-4 py-6">
             <h1 className="text-3xl text-lightgrey font-semibold font-primary">
-              Limbo
+              Reme
             </h1>
             <div className="flex lg:flex-row flex-col gap-x-24">
               <div className="lg:w-1/4 w-full">
@@ -491,4 +526,4 @@ You have the choice to go either really small or make a beeline for bigger wins 
   );
 };
 
-export default Limbo;
+export default Reme;

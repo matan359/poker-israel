@@ -9,19 +9,82 @@ import { GoArrowSwitch } from "react-icons/go";
 import Ripples from 'react-ripples'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import io from 'socket.io-client'; // Import the Socket.io client library
+import io from 'socket.io-client';
 import axios from 'axios';
 import { Card, Skeleton, Button, Checkbox } from '@nextui-org/react';
 import * as CryptoJS from 'crypto-js';
+
+// Helper functions - moved before component
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function roundedToFixed(number, decimals){
+  number = Number((parseFloat(number).toFixed(5)));
+  var number_string = number.toString();
+  var decimals_string = 0;
+  if(number_string.split('.')[1] !== undefined) decimals_string = number_string.split('.')[1].length;
+  while(decimals_string - decimals > 0) {
+    number_string = number_string.slice(0, -1);
+    decimals_string --;
+  }
+  return Number(number_string);
+}
+
+function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+function sha256(s) {
+  return CryptoJS.SHA256(s).toString(CryptoJS.enc.Hex);
+}
+
+function clamp(num, min, max) {
+  return Math.min(Math.max(num, min), max);
+}
+
+function getGameHash(gameSeed, clientSeed) {
+  return CryptoJS.HmacSHA256(clientSeed, gameSeed).toString(CryptoJS.enc.Hex);
+}
+
+function getNumberFromHash(gameHash) {
+  return parseInt(gameHash.slice(0, 52 / 4), 16);
+}
+
+const HOUSE_EDGE = 4;
+const MAX_MULTIPLIER = 1000.00;
+
+function generateRandomGame() {
+  let gameSeed = generateRandomString(32);
+  const clientSeed = '893a28219f012dc6ad42e442a9eaa926dddbea4d7f5ff16ddfeb3b5a72ef6094';
+  
+  function getCrashPoint(gameHash) {
+    const n = getNumberFromHash(gameHash);
+    const e = Math.pow(2, 52);
+    const num = Math.floor(((100 - HOUSE_EDGE) * e - n) / (e - n)) / 100;
+    return clamp(num, 1.00, MAX_MULTIPLIER);
+  }
+
+  gameSeed = sha256(gameSeed);
+  const gameHash = getGameHash(gameSeed, clientSeed);
+  const crashPoint = getCrashPoint(gameHash);
+
+  return {
+    generatedGameSeed: gameSeed,
+    crashPoint: crashPoint
+  };
+}
+
 const Limbo = () => {
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState('');
   const [balance, setBalance] = useState(0.00);
   const [level, setLevel] = useState('');
-  const nrRoll_1 = getRandomInt(0, 9);
-  const nrRoll_2 = getRandomInt(0, 9);
-  const nrRoll_3 = getRandomInt(0, 9);
-  const nrRoll_4 = getRandomInt(0, 9);
   const [currentRoll, setCurrentRoll] = useState(null);
   const [crashPoint, setCrashPoint] = useState(null);
 
@@ -34,7 +97,13 @@ const Limbo = () => {
 
   useEffect(() => {
     // Initialize socket connection
-    const socket = io('http://localhost:3001');
+    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
+    const socket = io(socketUrl, {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
   
     // Set the socket state
     setSocket(socket);
@@ -48,17 +117,25 @@ const Limbo = () => {
       
       try {
         // Emit 'getUserData' event to request user data from the server
-        socket.emit('getUserData'); // en onemlisi
+        socket.emit('getUserData');
   
         // Use a Promise to wait for the 'userData' event from the server
-        const userData = await new Promise((resolve) => {
+        const userData = await new Promise((resolve, reject) => {
+          // Set timeout to prevent hanging
+          const timeout = setTimeout(() => {
+            reject(new Error('Timeout waiting for user data'));
+          }, 5000);
+          
           // Listen for 'userData' event from the server
-          socket.on('userData', (data) => resolve(data));
+          socket.once('userData', (data) => {
+            clearTimeout(timeout);
+            resolve(data);
+          });
         });
   
         // Check if the component is still mounted
         if (isMounted) {
-          if (userData.success) {
+          if (userData && userData.success) {
             const {
               id,
               username,
@@ -78,16 +155,35 @@ const Limbo = () => {
             } = userData.userData;
   
             // Update state variables accordingly
-            setUsername(username);
-            setBalance(balance);
-            setLevel(level);
+            setUsername(username || 'Guest');
+            setBalance(balance || 0.00);
+            setLevel(level || '1');
           } else {
-            // Handle error
-            console.error("Failed to fetch user data");
+            // Handle error - use default values
+            console.warn("Failed to fetch user data, using defaults");
+            setUsername('Guest');
+            setBalance(0.00);
+            setLevel('1');
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.warn("Error fetching user data, using defaults:", error);
+        // Use default values if connection fails
+        if (isMounted) {
+          setUsername('Guest');
+          setBalance(0.00);
+          setLevel('1');
+        }
+      }
+    });
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+      console.warn('Socket connection error, using defaults:', error);
+      if (isMounted) {
+        setUsername('Guest');
+        setBalance(0.00);
+        setLevel('1');
       }
     });
   
@@ -96,57 +192,24 @@ const Limbo = () => {
       isMounted = false;
       socket.disconnect();
     };
-  }, []);  
-  function roundedToFixed(number, decimals){
-    number = Number((parseFloat(number).toFixed(5)));
-    
-    var number_string = number.toString();
-    var decimals_string = 0;
-    
-    if(number_string.split('.')[1] !== undefined) decimals_string = number_string.split('.')[1].length;
-    
-    while(decimals_string - decimals > 0) {
-      number_string = number_string.slice(0, -1);
-      
-      decimals_string --;
-    }
-    
-    return Number(number_string);
-  }
-  
-
-  const HOUSE_EDGE = 4; // Limbo game has a 4% house edge
-  const MAX_MULTIPLIER = 1000.00; // Limbo game has a 1000.00x max multiplier
-    
-  function generateRandomString(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-  }
-  
-  
-  //console.log(`Generated Game Seed: ${generatedGameSeed}`);
-  //console.log(`Crash Point: ${crashPoint}x`);
-    
-
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  }, []);
 
 const fetchUserData = async () => {
   try {
    const token = localStorage.getItem("token");
-     const response = await axios.get("http://localhost:3001/getUserData", {
+     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+     const response = await axios.get(`${apiUrl}/getUserData`, {
        headers: {
          Authorization: `Bearer ${token}`,
        },
+       timeout: 5000,
+     }).catch(() => {
+       // Return default data if API fails
+       return { data: { success: false } };
      });
 
-     if (response.data.success) {
-       const userData = response.data; // Assuming response.data contains all the fields
+     if (response.data && response.data.success) {
+       const userData = response.data;
 
        // Set state variables using destructuring
        const {
@@ -168,57 +231,20 @@ const fetchUserData = async () => {
        } = userData;
 
        // Now set your state variables accordingly
-       setUsername(username);
-       //setBalance(balance);
-       setLevel(level);
+       setUsername(username || 'Guest');
+       setLevel(level || '1');
      } else {
        // Handle error
-       console.error("Failed to fetch user data");
+       console.warn("Failed to fetch user data, using defaults");
+       setUsername('Guest');
+       setLevel('1');
      }
    } catch (error) {
-     console.error("Error fetching user data:", error);
+     console.warn("Error fetching user data, using defaults:", error);
+     setUsername('Guest');
+     setLevel('1');
    }
  };
-  
-   // fetchUserData();
-   function generateRandomGame() {
-    // Generate a random game seed
-    let gameSeed = generateRandomString(32);
-
-    const clientSeed = '893a28219f012dc6ad42e442a9eaa926dddbea4d7f5ff16ddfeb3b5a72ef6094';
-
-    function sha256(s) {
-      return CryptoJS.SHA256(s).toString(CryptoJS.enc.Hex);
-    }
-
-    function clamp(num, min, max) {
-      return Math.min(Math.max(num, min), max);
-    }
-
-    function getGameHash(gameSeed, clientSeed) {
-      return CryptoJS.HmacSHA256(clientSeed, gameSeed).toString(CryptoJS.enc.Hex);
-    }
-
-    function getNumberFromHash(gameHash) {
-      return parseInt(gameHash.slice(0, 52 / 4), 16);
-    }
-
-    function getCrashPoint(gameHash) {
-      const n = getNumberFromHash(gameHash);
-      const e = Math.pow(2, 52);
-      const num = Math.floor(((100 - HOUSE_EDGE) * e - n) / (e - n)) / 100;
-      return clamp(num, 1.00, MAX_MULTIPLIER);
-    }
-
-    gameSeed = sha256(gameSeed);
-    const gameHash = getGameHash(gameSeed, clientSeed);
-    const crashPoint = getCrashPoint(gameHash);
-
-    return {
-      generatedGameSeed: gameSeed,
-      crashPoint: crashPoint
-    };
-  }
 
 
    const handlePlaceBets = async () => {
@@ -247,24 +273,26 @@ const fetchUserData = async () => {
         console.log (betAmount * MultiplierAmount);
         console.log('Win Amount (Win):', winamount);
         toast.success(`Place Bet successful! You won ${winamount} coins.`);
-        setBalance(winamount);
-
-        socket.emit('winbet', { winamount, username });
-
+        setBalance(prev => prev + winamount);
+        if (socket && socket.connected) {
+          socket.emit('winbet', { winamount, username });
+        }
       } else if (playerLosts) {
         // Player wins
         const loseamount = (- betAmount);
         console.log('Updated Balance (Loss):', loseamount);
-        setBalance(loseamount);
+        setBalance(prev => prev - betAmount);
+        if (socket && socket.connected) {
+          socket.emit('losebet', { loseamount, username });
+        }
         toast.error(`Place Bet successful! You Lost ${betAmount} coins.`);
-        socket.emit('losebet', { loseamount, username });
       }
   
       // Update the crashPoint state
     } catch (error) {
-      console.error('Error placing bet:', error.message);
+      console.error('Error placing bet:', error);
       // Handle the error, possibly show an error toast to the user
-      toast.error('Error placing bet');
+      toast.error('Error placing bet. Please try again.');
     }
   };
           
