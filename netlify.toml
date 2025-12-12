@@ -6,8 +6,11 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
 
+# SPA redirects - handle all routes including query parameters
+# This ensures that all routes (/, /lobby, /game, /store, etc.) work on refresh
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 

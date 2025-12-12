@@ -859,6 +859,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Catch-all route - redirects unknown routes to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ErrorBoundary>
