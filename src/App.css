@@ -30,20 +30,6 @@ h1, h2, h3, h4, h5, h6 {
   to { transform: rotate(360deg); }
 }
 
-.modern-poker-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url('/assets/poker-table-background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: -999;
-  pointer-events: none;
-}
-
 .poker-table--wrapper {
   min-height: 100vh;
   width: 100%;
