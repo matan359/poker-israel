@@ -140,7 +140,13 @@ const Dino = () => {
    
   useEffect(() => {
     // Initialize socket connection
-    const socket = io('http://localhost:3001');
+    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
+    const socket = io(socketUrl, {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
   
     // Set the socket state
     setSocket(socket);
@@ -154,17 +160,25 @@ const Dino = () => {
       
       try {
         // Emit 'getUserData' event to request user data from the server
-        socket.emit('getUserData'); // en onemlisi
+        socket.emit('getUserData');
   
         // Use a Promise to wait for the 'userData' event from the server
-        const userData = await new Promise((resolve) => {
+        const userData = await new Promise((resolve, reject) => {
+          // Set timeout to prevent hanging
+          const timeout = setTimeout(() => {
+            reject(new Error('Timeout waiting for user data'));
+          }, 5000);
+          
           // Listen for 'userData' event from the server
-          socket.on('userData', (data) => resolve(data));
+          socket.once('userData', (data) => {
+            clearTimeout(timeout);
+            resolve(data);
+          });
         });
   
         // Check if the component is still mounted
         if (isMounted) {
-          if (userData.success) {
+          if (userData && userData.success) {
             const {
               id,
               username,
@@ -184,16 +198,35 @@ const Dino = () => {
             } = userData.userData;
   
             // Update state variables accordingly
-            setUsername(username);
-            setBalance(balance);
-            setLevel(level);
+            setUsername(username || 'Guest');
+            setBalance(balance || 0.00);
+            setLevel(level || '1');
           } else {
-            // Handle error
-            console.error("Failed to fetch user data");
+            // Handle error - use default values
+            console.warn("Failed to fetch user data, using defaults");
+            setUsername('Guest');
+            setBalance(0.00);
+            setLevel('1');
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.warn("Error fetching user data, using defaults:", error);
+        // Use default values if connection fails
+        if (isMounted) {
+          setUsername('Guest');
+          setBalance(0.00);
+          setLevel('1');
+        }
+      }
+    });
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+      console.warn('Socket connection error, using defaults:', error);
+      if (isMounted) {
+        setUsername('Guest');
+        setBalance(0.00);
+        setLevel('1');
       }
     });
   
@@ -298,10 +331,15 @@ const Dino = () => {
 const fetchUserData = async () => {
   try {
    const token = localStorage.getItem("token");
-     const response = await axios.get("http://localhost:3001/getUserData", {
+     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+     const response = await axios.get(`${apiUrl}/getUserData`, {
        headers: {
          Authorization: `Bearer ${token}`,
        },
+       timeout: 5000,
+     }).catch(() => {
+       // Return default data if API fails
+       return { data: { success: false } };
      });
 
      if (response.data.success) {
@@ -404,7 +442,9 @@ const fetchUserData = async () => {
         const winamount = totalamount; // Convert to integer
         console.log('winamount Balance (Win):', winamount);
         setBalance(winamount);
-        socket.emit('winbet', { winamount, username });
+        if (socket && socket.connected) {
+          socket.emit('winbet', { winamount, username });
+        }
 
         toast.success(`Place Bet successful! You won ${(betAmount * multiplier)} coins.`);
       } else if (playerLost) {
@@ -413,7 +453,9 @@ const fetchUserData = async () => {
         console.log('Updated Balance (Loss):', loseamount);
         setBalance(loseamount);
         toast.error(`Place Bet successful! You Lost ${(betAmount)} coins.`);
-        socket.emit('losebet', { loseamount, username });
+        if (socket && socket.connected) {
+          socket.emit('losebet', { loseamount, username });
+        }
 
       }
   
