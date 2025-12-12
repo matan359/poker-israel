@@ -1,6 +1,6 @@
 import React from "react";
 
-import { games } from "../GameNames";
+import { games } from "../data/GameNames";
 import GameItem from "./GameItem";
 
 export default function GameList() {

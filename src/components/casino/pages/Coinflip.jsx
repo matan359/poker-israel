@@ -4,7 +4,7 @@ import ChatMenu from "../components/ChatMenu";
 import { BsFileLock2Fill } from "react-icons/bs";
 import Coin1 from "../assets/img/coinside1.png";
 import Coin2 from "../assets/img/coinside2.png";
-import { coinFlipBets } from "../gamesData";
+import { coinFlipBets } from "../data/gamesData";
 import Tables from "../components/Tables";
 import Footer from "../components/Footer";
 

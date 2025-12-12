@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { betData } from "../betData";
-import { category } from "../category";
+import { betData } from "../data/betData";
+import { category } from "../data/category";
 import TableUser from "./TableUser";
 import TableButtons from "./TableButtons";
 

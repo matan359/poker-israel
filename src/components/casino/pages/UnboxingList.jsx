@@ -1,5 +1,5 @@
 import React from "react";
-import { unboxingData } from "../unboxingData";
+import { unboxingData } from "../data/unboxingData";
 import { useParams } from "react-router-dom";
 import NavbarComp from "../components/NavbarComp";
 import ChatMenu from "../components/ChatMenu";

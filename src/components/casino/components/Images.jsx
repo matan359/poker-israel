@@ -1,5 +1,5 @@
 import React from "react";
-import { imageData } from "../gamesData";
+import { imageData } from "../data/gamesData";
 import { Link } from "react-router-dom";
 
 const Images = () => {

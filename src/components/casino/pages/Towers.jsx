@@ -3,7 +3,7 @@ import NavbarComp from "../components/NavbarComp";
 import ChatMenu from "../components/ChatMenu";
 import Footer from "../components/Footer";
 import { BsFileLock2Fill } from "react-icons/bs";
-import { towersData } from "../gamesData";
+import { towersData } from "../data/gamesData";
 
 let total = [];
 for (let i = 0; i < 30; i++) {

@@ -1,6 +1,6 @@
 import React from "react";
 import DiscordImage from "../assets/img/Discord.jpg";
-import { imageData } from "../gamesData";
+import { imageData } from "../data/gamesData";
 import Images from "./Images";
 import Tables from "./Tables";
 import MainPart from "./MainPart";

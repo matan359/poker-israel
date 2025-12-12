@@ -1,6 +1,6 @@
 import React,{useState, useEffect} from 'react'
 import random from 'random'
-import miness from '../components/Miness'
+// import miness from '../components/Miness' // Component not found, commented out
 import Bombe from '../components/Bombe'
 import NavbarComp from "../components/NavbarComp";
 import ChatMenu from "../components/ChatMenu";
