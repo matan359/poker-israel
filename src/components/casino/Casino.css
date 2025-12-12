@@ -504,7 +504,7 @@ input::-webkit-inner-spin-button {
 }
 
 .dc-img {
-  background-image: url("/assets/discord.jpg");
+  /* background-image: url("../../assets/discord.jpg"); */ /* Asset not found - commented out */
   width: 100%;
   height: 200px;
   background-position: center;
