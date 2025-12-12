@@ -1,9 +1,11 @@
-import Avatar1 from './assets/img/avatar/1.png'
-import Avatar2 from './assets/img/avatar/2.png'
-import Avatar3 from './assets/img/avatar/3.png'
-import Avatar4 from './assets/img/avatar/4.png'
-import Avatar5 from './assets/img/avatar/5.png'
-import Avatar6 from './assets/img/avatar/6.png'
+// Assets not found - using placeholder paths
+// import Avatar1 from './assets/img/avatar/1.png'
+const Avatar1 = "/assets/avatar/1.png";
+const Avatar2 = "/assets/avatar/2.png";
+const Avatar3 = "/assets/avatar/3.png";
+const Avatar4 = "/assets/avatar/4.png";
+const Avatar5 = "/assets/avatar/5.png";
+const Avatar6 = "/assets/avatar/6.png";
 
 
 export const data = [
