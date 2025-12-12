@@ -1,6 +1,9 @@
 import React, { Fragment, useEffect, useState } from "react";
-import LargeLogo from "../assets/img/LargeLogo.png";
-import SmallLogo from "../assets/img/SmallLogo.png";
+// Assets not found - using placeholder paths
+// import LargeLogo from "../assets/img/LargeLogo.png";
+// import SmallLogo from "../assets/img/SmallLogo.png";
+const LargeLogo = "/assets/large-logo.png"; // Placeholder
+const SmallLogo = "/assets/small-logo.png"; // Placeholder
 import { GiPerspectiveDiceSixFacesTwo, GiTrophyCup } from "react-icons/gi";
 import {
   BsFillGiftFill,
@@ -13,28 +16,31 @@ import { TbCardsFilled } from "react-icons/tb";
 import { BiChevronDown, BiSolidWallet } from "react-icons/bi";
 import { MdTimer } from "react-icons/md";
 import { Menu, Transition } from "@headlessui/react";
-import RegisterPage from './RegisterPage';  // Adjust the path accordingly
+// import RegisterPage from './RegisterPage';  // RegisterPage not found - commented out
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import userImage from "../assets/img/avatar/1.png";
+// Assets not found - using placeholder paths
+// import userImage from "../assets/img/avatar/1.png";
+const userImage = "/assets/avatar.png"; // Placeholder
 
-//menu-images
-import Crash from "../assets/img/games-menu/crash.png";
-import Roulette from "../assets/img/games-menu/roulette.png";
-import Slots from "../assets/img/games-menu/slots.png";
-import Blackjack from "../assets/img/games-menu/blackjack.png";
-import Reme from "../assets/img/games-menu/reme.png";
-import Limbo from "../assets/img/games-menu/limbo.png";
-import CoinFlip from "../assets/img/games-menu/coinflip.png";
-import Towers from "../assets/img/games-menu/towers.png";
-import Mines from "../assets/img/games-menu/mines.png";
-import Unboxing from "../assets/img/games-menu/unboxing.png";
-import Dice from "../assets/img/games-menu/dice.png";
-import Keno from "../assets/img/games-menu/keno.png";
-import Plinko from "../assets/img/games-menu/plinko.png";
-import Rakeback from "../assets/img/rewards-menu/rakeback.png";
-import Promo from "../assets/img/rewards-menu/promo.png";
+//menu-images - using placeholder paths
+// import Crash from "../assets/img/games-menu/crash.png";
+const Crash = "/assets/games/crash.png";
+const Roulette = "/assets/games/roulette.png";
+const Slots = "/assets/games/slots.png";
+const Blackjack = "/assets/games/blackjack.png";
+const Reme = "/assets/games/reme.png";
+const Limbo = "/assets/games/limbo.png";
+const CoinFlip = "/assets/games/coinflip.png";
+const Towers = "/assets/games/towers.png";
+const Mines = "/assets/games/mines.png";
+const Unboxing = "/assets/games/unboxing.png";
+const Dice = "/assets/games/dice.png";
+const Keno = "/assets/games/keno.png";
+const Plinko = "/assets/games/plinko.png";
+const Rakeback = "/assets/rewards/rakeback.png";
+const Promo = "/assets/rewards/promo.png";
 import ResponsiveNavbar from "./ResponsiveNavbar";
 import { Link } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";

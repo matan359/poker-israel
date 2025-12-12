@@ -17,14 +17,14 @@ import Dice from "../pages/Dice";
 import Keno from "../pages/Keno";
 import Plinko from "../pages/Plinko";
 import UnboxingList from "../pages/UnboxingList";
-import RegisterPage from './RegisterPage';
+// import RegisterPage from './RegisterPage'; // RegisterPage not found - commented out
 
 const Pages = () => {
   return (
     <div>
       <Routes key={location.pathname} location={location}>
         <Route path="/" element={<Home/>} />
-        <Route path="/register" element={<RegisterPage/>} />
+        {/* <Route path="/register" element={<RegisterPage/>} /> */}
 
         <Route path="/games/crash/*" element={<Crash/>} />
         <Route path="/games/roulette/*" element={<Roulette/>} />

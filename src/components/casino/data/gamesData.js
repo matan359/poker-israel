@@ -1,18 +1,20 @@
-import Crash from "./assets/img/games-menu/crash.png";
-import Roulette from "./assets/img/games-menu/roulette.png";
-import Slots from "./assets/img/games-menu/slots.png";
-import Blackjack from "./assets/img/games-menu/blackjack.png";
-import Reme from "./assets/img/games-menu/reme.png";
-import Limbo from "./assets/img/games-menu/limbo.png";
-import Coinflip from "./assets/img/games-menu/coinflip.png";
-import Towers from "./assets/img/games-menu/towers.png";
-import Mines from "./assets/img/games-menu/mines.png";
-import Unboxing from "./assets/img/games-menu/unboxing.png";
-import Dice from "./assets/img/games-menu/dice.png";
-import Keno from "./assets/img/games-menu/keno.png";
-import Plinko from "./assets/img/games-menu/plinko.png";
-import Rakeback from "./assets/img/rewards-menu/rakeback.png";
-import Promo from "./assets/img/rewards-menu/promo.png";
+// Assets not found - using placeholder paths
+// import Crash from "./assets/img/games-menu/crash.png";
+const Crash = "/assets/games/crash.png";
+const Roulette = "/assets/games/roulette.png";
+const Slots = "/assets/games/slots.png";
+const Blackjack = "/assets/games/blackjack.png";
+const Reme = "/assets/games/reme.png";
+const Limbo = "/assets/games/limbo.png";
+const Coinflip = "/assets/games/coinflip.png";
+const Towers = "/assets/games/towers.png";
+const Mines = "/assets/games/mines.png";
+const Unboxing = "/assets/games/unboxing.png";
+const Dice = "/assets/games/dice.png";
+const Keno = "/assets/games/keno.png";
+const Plinko = "/assets/games/plinko.png";
+const Rakeback = "/assets/rewards/rakeback.png";
+const Promo = "/assets/rewards/promo.png";
 
 export const imageData = [
   {

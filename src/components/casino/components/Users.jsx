@@ -1,5 +1,5 @@
 import React from "react";
-import { data } from "../data";
+import { data } from "../data/data";
 // console.log(data);
 
 const userData = data.map((user, idx) => {

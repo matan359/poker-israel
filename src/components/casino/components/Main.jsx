@@ -1,5 +1,6 @@
 import React from "react";
-import DiscordImage from "../assets/img/Discord.jpg";
+// import DiscordImage from "../assets/img/Discord.jpg";
+const DiscordImage = "/assets/discord.jpg"; // Placeholder
 import { imageData } from "../data/gamesData";
 import Images from "./Images";
 import Tables from "./Tables";

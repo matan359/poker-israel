@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react'
-import { unboxingData } from '../unboxingData'
+import { unboxingData } from '../data/unboxingData'
 
 
 export const BoxContext = createContext()

@@ -2,14 +2,17 @@ import React, { useRef, useState } from "react";
 import NavbarComp from "../components/NavbarComp";
 import ChatMenu from "../components/ChatMenu";
 import { BsFileLock2Fill } from "react-icons/bs";
-import Coin1 from "../assets/img/coinside1.png";
-import Coin2 from "../assets/img/coinside2.png";
+// Assets not found - using placeholder or public path
+// import Coin1 from "../assets/img/coinside1.png";
+// import Coin2 from "../assets/img/coinside2.png";
+const Coin1 = "/assets/coin1.png"; // Placeholder - update with actual path
+const Coin2 = "/assets/coin2.png"; // Placeholder - update with actual path
 import { coinFlipBets } from "../data/gamesData";
 import Tables from "../components/Tables";
 import Footer from "../components/Footer";
 
 const Coinflip = () => {
-  const [coin, setCoin] = useState(Coin2);
+  const [coin, setCoin] = useState(Coin2 || "/assets/coin2.png");
   const [betPlaced, setBetPlaced] = useState(false); // New state variable
   const [betAmount, setBetAmount] = useState(1);
 
