@@ -629,7 +629,15 @@ function GameTable() {
   if (!players || (loading && !gameInitialized)) {
     return (
       <div className="game-layout">
-        <div className="modern-poker-background" />
+        <div 
+          className="modern-poker-background"
+          style={{
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
         <div className="loading-spinner-container">
             <Spinner />
             <div>Loading game...</div>
@@ -641,7 +649,15 @@ function GameTable() {
   if (winnerFound) {
     return (
       <div className="game-layout">
-        <div className="modern-poker-background" />
+        <div 
+          className="modern-poker-background"
+          style={{
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
         <WinScreen />
       </div>
     );
@@ -649,7 +665,15 @@ function GameTable() {
 
   return (
     <div className="game-layout">
-      <div className="modern-poker-background" />
+      <div 
+        className="modern-poker-background"
+        style={{
+          backgroundImage: 'url(/assets/poker-table-background.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
       
       {/* Top Bar with Logo */}
       <div className="game-top-bar compact">
@@ -823,7 +847,15 @@ function App() {
   if (authLoading) {
     return (
       <div className="game-layout">
-        <div className="modern-poker-background" />
+        <div 
+          className="modern-poker-background"
+          style={{
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
         <div className="loading-spinner-container">
             <div className="modern-spinner" />
         </div>
@@ -891,7 +923,15 @@ function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <div className="game-layout">
-        <div className="modern-poker-background" />
+        <div 
+          className="modern-poker-background"
+          style={{
+            backgroundImage: 'url(/assets/poker-table-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
         <div className="loading-spinner-container">
           <div className="modern-spinner" />
         </div>
