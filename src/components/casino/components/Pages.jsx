@@ -28,21 +28,21 @@ const Pages = () => {
         <Route path="" element={<Home/>} />
         {/* <Route path="register" element={<RegisterPage/>} /> */}
 
-        <Route path="games/crash/*" element={<Crash/>} />
-        <Route path="games/roulette/*" element={<Roulette/>} />
-        <Route path="games/slots/*" element={<Slots/>} />
-        <Route path="games/blackjack/*" element={<Blackjack/>} />
-        <Route path="games/reme/*" element={<Reme/>} />
-        <Route path="games/limbo/*" element={<Limbo/>} />
-        <Route path="games/coinflip/*" element={<Coinflip/>} />
-        <Route path="games/towers/*" element={<Towers/>} />
-        <Route path="games/mines/*" element={<Mines/>} />
-        <Route path="games/unboxing/*" element={<Unboxing/>} />
-        <Route path="games/dice/*" element={<Dice/>} />
-        <Route path="games/keno/*" element={<Keno/>} />
-        <Route path="games/plinko/*" element={<Plinko/>} />
-        <Route path="games/race/*" element={<Race/>} />
-        <Route path="games/discord/*" element={<Discord/>} />
+        <Route path="games/crash" element={<Crash/>} />
+        <Route path="games/roulette" element={<Roulette/>} />
+        <Route path="games/slots" element={<Slots/>} />
+        <Route path="games/blackjack" element={<Blackjack/>} />
+        <Route path="games/reme" element={<Reme/>} />
+        <Route path="games/limbo" element={<Limbo/>} />
+        <Route path="games/coinflip" element={<Coinflip/>} />
+        <Route path="games/towers" element={<Towers/>} />
+        <Route path="games/mines" element={<Mines/>} />
+        <Route path="games/unboxing" element={<Unboxing/>} />
+        <Route path="games/dice" element={<Dice/>} />
+        <Route path="games/keno" element={<Keno/>} />
+        <Route path="games/plinko" element={<Plinko/>} />
+        <Route path="games/race" element={<Race/>} />
+        <Route path="games/discord" element={<Discord/>} />
         <Route path="games/:id" element={<UnboxingList/>} />
       </Routes>
     </div>
