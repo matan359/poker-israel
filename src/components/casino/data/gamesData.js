@@ -20,77 +20,77 @@ export const imageData = [
   {
     image: Crash,
     text: "CRASH",
-    pathName: "/games/crash",
+    pathName: "/casino/games/crash",
   },
   {
     image: Roulette,
     text: "ROULETTE",
-    pathName: "/games/roulette",
+    pathName: "/casino/games/roulette",
   },
   {
     image: Slots,
     text: "SLOTS",
-    pathName: "/games/slots",
+    pathName: "/casino/games/slots",
   },
   {
     image: Blackjack,
     text: "BLACKJACK",
-    pathName: "/games/blackjack",
+    pathName: "/casino/games/blackjack",
   },
   {
     image: Reme,
     text: "REME",
-    pathName: "/games/reme",
+    pathName: "/casino/games/reme",
   },
   {
     image: Limbo,
     text: "LIMBO",
-    pathName: "/games/limbo",
+    pathName: "/casino/games/limbo",
   },
   {
     image: Coinflip,
     text: "COINFLIP",
-    pathName: "/games/coinflip",
+    pathName: "/casino/games/coinflip",
   },
   {
     image: Towers,
     text: "TOWERS",
-    pathName: "/games/towers",
+    pathName: "/casino/games/towers",
   },
   {
     image: Mines,
     text: "MINES",
-    pathName: "/games/mines",
+    pathName: "/casino/games/mines",
   },
   {
     image: Unboxing,
     text: "UNBOXING",
-    pathName: "/games/unboxing",
+    pathName: "/casino/games/unboxing",
   },
   {
     image: Dice,
     text: "DICE",
-    pathName: "/games/dice",
+    pathName: "/casino/games/dice",
   },
   {
     image: Keno,
     text: "KENO",
-    pathName: "/keno",
+    pathName: "/casino/games/keno",
   },
   {
     image: Plinko,
     text: "PLINKO",
-    pathName: "/games/plinko",
+    pathName: "/casino/games/plinko",
   },
   {
     image: Rakeback,
     text: "RAKEBACK",
-    pathName: "/games/rakeback",
+    pathName: "/casino/games/rakeback",
   },
   {
     image: Promo,
     text: "PROMO",
-    pathName: "/games/promo",
+    pathName: "/casino/games/promo",
   },
 ];
 

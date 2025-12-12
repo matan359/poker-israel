@@ -1,7 +1,7 @@
 import React from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Home from '../pages/Home'
 import Discord from "../pages/Discord";
-import { Route, Routes } from "react-router-dom";
 import Race from "../pages/Race";
 import Crash from "../pages/Crash";
 import Roulette from "../pages/Roulette";
@@ -20,28 +20,30 @@ import UnboxingList from "../pages/UnboxingList";
 // import RegisterPage from './RegisterPage'; // RegisterPage not found - commented out
 
 const Pages = () => {
+  const location = useLocation();
+  
   return (
     <div>
       <Routes key={location.pathname} location={location}>
-        <Route path="/" element={<Home/>} />
-        {/* <Route path="/register" element={<RegisterPage/>} /> */}
+        <Route path="" element={<Home/>} />
+        {/* <Route path="register" element={<RegisterPage/>} /> */}
 
-        <Route path="/games/crash/*" element={<Crash/>} />
-        <Route path="/games/roulette/*" element={<Roulette/>} />
-        <Route path="/games/slots/*" element={<Slots/>} />
-        <Route path="/games/blackjack/*" element={<Blackjack/>} />
-        <Route path="/games/reme/*" element={<Reme/>} />
-        <Route path="/games/limbo/*" element={<Limbo/>} />
-        <Route path="/games/coinflip/*" element={<Coinflip/>} />
-        <Route path="/games/towers/*" element={<Towers/>} />
-        <Route path="/games/mines/*" element={<Mines/>} />
-        <Route path="/games/unboxing/*" element={<Unboxing/>} />
-        <Route path="/games/dice/*" element={<Dice/>} />
-        <Route path="/games/keno/*" element={<Keno/>} />
-        <Route path="/games/plinko/*" element={<Plinko/>} />
-        <Route path="/games/race/*" element={<Race/>} />
-        <Route path="/games/discord/*" element={<Discord/>} />
-        <Route path="/games/:id" element = {<UnboxingList/>}/>
+        <Route path="games/crash/*" element={<Crash/>} />
+        <Route path="games/roulette/*" element={<Roulette/>} />
+        <Route path="games/slots/*" element={<Slots/>} />
+        <Route path="games/blackjack/*" element={<Blackjack/>} />
+        <Route path="games/reme/*" element={<Reme/>} />
+        <Route path="games/limbo/*" element={<Limbo/>} />
+        <Route path="games/coinflip/*" element={<Coinflip/>} />
+        <Route path="games/towers/*" element={<Towers/>} />
+        <Route path="games/mines/*" element={<Mines/>} />
+        <Route path="games/unboxing/*" element={<Unboxing/>} />
+        <Route path="games/dice/*" element={<Dice/>} />
+        <Route path="games/keno/*" element={<Keno/>} />
+        <Route path="games/plinko/*" element={<Plinko/>} />
+        <Route path="games/race/*" element={<Race/>} />
+        <Route path="games/discord/*" element={<Discord/>} />
+        <Route path="games/:id" element={<UnboxingList/>} />
       </Routes>
     </div>
   );

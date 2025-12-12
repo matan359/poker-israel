@@ -86,11 +86,11 @@ const Navbar = () => {
       <div className="flex items-center justify-center gap-x-8">
         <div className="cursor-pointer ">
           {windowWidth < 600 ? (
-            <Link to="/">
+            <Link to="/casino">
               <img src={SmallLogo} alt="Yeni Logo" />
             </Link>
           ) : (
-            <Link to="/">
+            <Link to="/casino">
               <img src={LargeLogo} alt="Yeni Logo" />
             </Link>
           )}
@@ -120,7 +120,7 @@ const Navbar = () => {
               >
                 <Menu.Items className="fixed right-0 left-0 z-10 mt-6 w-[100vw]  rounded-md bg-primary shadow-lg ring-1 ring-primary ring-opacity-5 focus:outline-none flex items-center flex-wrap h-[350px]">
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="crash" to="/games/crash/*">
+                    <Menu.Item as={Link} name="crash" to="/casino/games/crash">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -129,7 +129,7 @@ const Navbar = () => {
                             className="rounded-xl w-[225px]"
                           />
                           <a
-                            to="/crash/"
+                            to="/casino/games/crash"
                             className={classNames(
                               active ? "text-lightgrey" : "text-grey",
                               "block px-4 py-2 text-lg font-semibold text-center"
@@ -142,7 +142,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="roulette" to="/games/roulette/*">
+                    <Menu.Item as={Link} name="roulette" to="/casino/games/roulette">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -164,7 +164,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="slots" to="/games/slots/*">
+                    <Menu.Item as={Link} name="slots" to="/casino/games/slots">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -189,7 +189,7 @@ const Navbar = () => {
                     <Menu.Item
                       as={Link}
                       name="blackjack"
-                      to="/games/blackjack/*"
+                      to="/casino/games/blackjack"
                     >
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
@@ -212,7 +212,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="reme" to="/games/reme/*">
+                    <Menu.Item as={Link} name="reme" to="/casino/games/reme">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -234,7 +234,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="limbo" to="/games/limbo/*">
+                    <Menu.Item as={Link} name="limbo" to="/casino/games/limbo">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -256,7 +256,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="coinflip" to="/games/coinflip/*">
+                    <Menu.Item as={Link} name="coinflip" to="/casino/games/coinflip">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -278,7 +278,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="towers" to="/games/towers/*">
+                    <Menu.Item as={Link} name="towers" to="/casino/games/towers">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -300,7 +300,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="mines" to="/games/mines/*">
+                    <Menu.Item as={Link} name="mines" to="/casino/games/mines">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -322,7 +322,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="unboxing" to="/games/unboxing/*">
+                    <Menu.Item as={Link} name="unboxing" to="/casino/games/unboxing">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -344,7 +344,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="dice" to="/games/dice/*">
+                    <Menu.Item as={Link} name="dice" to="/casino/games/dice">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -366,7 +366,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="keno" to="/games/keno/*">
+                    <Menu.Item as={Link} name="keno" to="/casino/games/keno">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
@@ -388,7 +388,7 @@ const Navbar = () => {
                     </Menu.Item>
                   </div>
                   <div className="py-1 px-6">
-                    <Menu.Item as={Link} name="plinko" to="/games/plinko/*">
+                    <Menu.Item as={Link} name="plinko" to="/casino/games/plinko">
                       {({ active }) => (
                         <div className="hover:opacity-80 cursor-pointer transition-all duration-200">
                           <img
