@@ -8,7 +8,7 @@ const NavbarComp = () => {
     <div>
       <Navbar />
       <Routes>
-        <Route path="/discord" element={<Discord />}></Route>
+        <Route path="games/discord" element={<Discord />}></Route>
       </Routes>
     </div>
   );
