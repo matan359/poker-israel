@@ -446,7 +446,12 @@ const Lobby = ({ onJoinTable, onCreateTable }) => {
         }}
       />
       <div className="lobby-container" style={{ position: 'relative', zIndex: 1 }}>
-      {/* Top Menu Bar */}
+      {/* Logo - Separate from menu, on background */}
+      <div className="lobby-logo-container">
+        <PokerIsraelLogo size="medium" />
+      </div>
+      
+      {/* Top Menu Bar - Compact, without logo */}
       <div className="lobby-menu-bar">
         <div className="lobby-menu-left">
           {userProfile && (
@@ -457,9 +462,6 @@ const Lobby = ({ onJoinTable, onCreateTable }) => {
               </div>
             </>
           )}
-        </div>
-        <div className="lobby-menu-center">
-          <PokerIsraelLogo size="medium" />
         </div>
         <div className="lobby-menu-right">
           {userProfile ? (

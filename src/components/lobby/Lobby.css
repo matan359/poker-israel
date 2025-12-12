@@ -40,7 +40,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 30px;
+  padding: 8px 30px;
   background: linear-gradient(135deg, rgba(0, 17, 34, 0.65) 0%, rgba(0, 51, 102, 0.65) 100%);
   border-bottom: 2px solid rgba(0, 255, 255, 0.4);
   box-shadow: 
@@ -52,7 +52,8 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   animation: menuSlideDown 0.6s ease-out;
-  min-height: 60px;
+  min-height: 45px;
+  height: 45px;
   will-change: transform;
   transform: translateZ(0);
   contain: layout style paint;
@@ -101,13 +102,6 @@
   flex: 1;
 }
 
-.lobby-menu-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
 .lobby-menu-right {
   display: flex;
   align-items: center;
@@ -116,10 +110,24 @@
   justify-content: flex-end;
 }
 
-.lobby-menu-right {
+/* Logo container - separate from menu, on background */
+.lobby-logo-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  pointer-events: none;
+  filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6)) drop-shadow(0 0 40px rgba(0, 102, 255, 0.4));
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
 }
 
 .lobby-user-info {
@@ -127,9 +135,9 @@
   flex-direction: column;
   align-items: flex-end;
   margin-right: 10px;
-  padding: 8px 16px;
+  padding: 4px 12px;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 17, 34, 0.5) 100%);
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1.5px solid rgba(0, 255, 255, 0.3);
   box-shadow: 
     0 0 15px rgba(0, 255, 255, 0.3),
@@ -140,6 +148,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+}
 }
 
 .lobby-user-info::before {
@@ -170,7 +179,7 @@
 .lobby-username {
   color: #FFFFFF;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   text-shadow: 
     0 0 10px rgba(0, 255, 255, 0.8),
     0 0 20px rgba(0, 102, 255, 0.5),
@@ -184,7 +193,7 @@
 
 .lobby-chips {
   color: #FFD700;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   text-shadow: 
     0 0 8px rgba(255, 215, 0, 0.6),
@@ -211,10 +220,10 @@
 }
 
 .lobby-menu-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: linear-gradient(135deg, rgba(0, 102, 255, 0.6) 0%, rgba(0, 51, 102, 0.6) 100%);
   border: 1.5px solid rgba(0, 255, 255, 0.4);
-  border-radius: 8px;
+  border-radius: 6px;
   color: #FFFFFF;
   box-shadow: 
     0 0 12px rgba(0, 255, 255, 0.3),
@@ -222,7 +231,7 @@
     inset 0 0 8px rgba(0, 102, 255, 0.15);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -958,11 +967,15 @@
   }
   
   .lobby-menu-left,
-  .lobby-menu-center,
   .lobby-menu-right {
     flex: none;
     width: 100%;
     justify-content: center;
+  }
+  
+  .lobby-logo-container {
+    top: 10px;
+    transform: translateX(-50%) scale(0.8);
   }
   
   .lobby-menu-center {
